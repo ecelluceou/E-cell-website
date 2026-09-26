@@ -25,14 +25,11 @@ import "swiper/css/pagination";
 
 const teamMembers = [
   { name: "Mehwish", role: "President", quote: "Building the future of entrepreneurship, one idea at a time.", image: "/images/team/President.png", socials: { instagram: "https://www.instagram.com/mehwiiiisssshhh", linkedin: "https://www.linkedin.com/in/mohammad-mehwish-a0774332a" } },
-  { name: "Mahesh", role: "Vice President", quote: "Innovation is the key to unlocking true potential.", image: "/images/team/Vice president.png", socials: { instagram: "https://www.instagram.com/maheshdreevn" } },
   { name: "Karthik", role: "Secretary", quote: "Ensuring our resources are utilized to their maximum impact.", image: "/images/team/secretary.png", socials: { linkedin: "https://in.linkedin.com/in/bandarugattu-sai-kartik-482350364" } },
   { name: "Khyathi", role: "Joint Secretary", quote: "Connecting brilliant minds and fostering lifelong relationships.", image: "/images/team/khyathi.png", socials: { instagram: "https://www.instagram.com/khyathi_7_5" } },
   { name: "Ronith", role: "Tech Lead", quote: "Code is poetry. Building robust systems for the future.", image: "/images/team/tech-lead.png", socials: { instagram: "https://www.instagram.com/ronith_playz", linkedin: "https://www.linkedin.com/in/ronith-vardhan-rachakonda-10a248382" } },
   { name: "Aneesh", role: "Marketing Lead", quote: "A picture is worth a thousand words. Let's tell our story.", image: "/images/team/marketing lead.png", socials: { instagram: "https://www.instagram.com/aneesh.raj.k" } },
   { name: "Khyathi", role: "Social Media Lead", quote: "Engage, inspire, connect. Building our digital community.", image: "/images/team/khyathi.png", socials: { instagram: "https://www.instagram.com/khyathi_7_5" } },
-  { name: "Kiran", role: "Design Lead", quote: "Good design is good business. Let's make it beautiful.", image: "/images/team/design team lead.png", socials: { instagram: "https://www.instagram.com/heyy.kirann" } },
-  { name: "Divya", role: "Editorial Lead", quote: "Words have power. Curating the voice of tomorrow.", image: "/images/team/editorial team lead.png", socials: { instagram: "https://www.instagram.com/_divya.54_" } },
 ];
 
 export default function TeamCarousel() {

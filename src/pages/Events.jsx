@@ -11,11 +11,23 @@ export default function Events() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [errorMsg, setErrorMsg] = useState(null);
+
   React.useEffect(() => {
     async function fetchEvents() {
-      const { data } = await supabase.from('events').select('*').order('date', { ascending: true });
-      setEvents(data || []);
-      setLoading(false);
+      try {
+        const { data, error } = await supabase.from('events').select('*').order('date', { ascending: true });
+        if (error) {
+          console.error('Supabase error fetching events:', error);
+          setErrorMsg(error.message);
+        }
+        setEvents(data || []);
+      } catch (err) {
+        console.error('Unexpected error fetching events:', err);
+        setErrorMsg(err.message);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchEvents();
   }, []);
@@ -59,6 +71,10 @@ export default function Events() {
       
       {loading ? (
         <div style={{ padding: '4rem', textAlign: 'center' }}>Loading events...</div>
+      ) : errorMsg ? (
+        <div style={{ padding: '4rem', textAlign: 'center', color: '#E4472E' }}>
+          Error loading events: {errorMsg}. Please ensure Supabase Row Level Security (RLS) allows anonymous reads for the 'events' table.
+        </div>
       ) : events.length === 0 ? (
         <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>No upcoming events scheduled.</div>
       ) : (

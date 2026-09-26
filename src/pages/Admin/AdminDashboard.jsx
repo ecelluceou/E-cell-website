@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, Routes, Route, useLocation } from 'react-router-dom';
 import { Calendar, Award, Database, Users, Settings, ChevronRight } from 'lucide-react';
 import ManageEvents from './ManageEvents';
+import ManageInitiatives from './ManageInitiatives';
 import EventData from './EventData';
 
 export default function AdminDashboard() {
@@ -66,7 +67,7 @@ export default function AdminDashboard() {
             </div>
           } />
           <Route path="/events" element={<ManageEvents />} />
-          <Route path="/initiatives" element={<div>Manage Initiatives (Coming Soon)</div>} />
+          <Route path="/initiatives" element={<ManageInitiatives />} />
           <Route path="/data" element={<EventData />} />
           <Route path="/leaderboards" element={<div>Manage Leaderboards (Coming Soon)</div>} />
         </Routes>
