@@ -4,6 +4,21 @@ import { Loader } from '../../components/UI/Loader';
 import { Plus, Trash2, Edit3, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const DEFAULT_INITIATIVE = {
+  id: 'startup-support',
+  title: 'Building a Startup? E-Cell Wants to Help!',
+  description: `Working on an early idea, an MVP, or building a venture that's already generating revenue?
+
+E-Cell UCEOU is here to support student founders with dedicated mentors, investor access, technical resources, and institutional backing.
+
+📌 No idea is too early-stage. 
+
+Fill out a quick form and tell us what you're building — we'll take it from there. Let's build something real.`,
+  link: 'https://forms.gle/7yk9PFLKEtyVqPr98',
+  image: '',
+  status: 'active'
+};
+
 export default function ManageInitiatives() {
   const [initiatives, setInitiatives] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +45,11 @@ export default function ManageInitiatives() {
   async function fetchInitiatives() {
     setLoading(true);
     const { data, error } = await supabase.from('initiatives').select('*').order('created_at', { ascending: false });
-    if (!error) setInitiatives(data || []);
+    const list = data ? [...data] : [];
+    if (!list.some(item => item.id === DEFAULT_INITIATIVE.id)) {
+      list.push(DEFAULT_INITIATIVE);
+    }
+    setInitiatives(list);
     setLoading(false);
   }
 
@@ -61,10 +80,9 @@ export default function ManageInitiatives() {
       ...formData,
     };
 
-    if (isEditing) {
-      await supabase.from('initiatives').update(payload).eq('id', formData.id);
-    } else {
-      await supabase.from('initiatives').insert([payload]);
+    const { error } = await supabase.from('initiatives').upsert(payload, { onConflict: 'id' });
+    if (error) {
+      alert('Error saving initiative: ' + error.message);
     }
 
     setFormData(getEmptyForm());
