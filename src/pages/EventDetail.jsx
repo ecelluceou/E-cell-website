@@ -205,7 +205,7 @@ export default function EventDetail() {
                 display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap'
               }}>
                 {event.title}
-                {event.status && event.status !== 'upcoming' && (
+                {event.status && event.status !== 'upcoming' && event.status !== 'active' ? (
                   <span style={{
                     fontSize: 'clamp(0.8rem, 2vw, 1.2rem)',
                     padding: '0.2rem 0.8rem',
@@ -217,6 +217,36 @@ export default function EventDetail() {
                     border: `1px solid ${event.status === 'ended' ? 'var(--glass-border)' : 'rgba(229,169,0,0.3)'}`
                   }}>
                     {event.status}
+                  </span>
+                ) : (isPast || event.status === 'active') && event.status !== 'ended' ? (
+                  <span style={{
+                    fontSize: 'clamp(0.8rem, 2vw, 1.2rem)',
+                    padding: '0.2rem 0.8rem',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    background: 'rgba(22,140,131,0.18)',
+                    color: 'var(--ecell-teal, #168C83)',
+                    border: '1px solid rgba(22,140,131,0.35)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 8px #4ade80', display: 'inline-block' }} />
+                    Active
+                  </span>
+                ) : (
+                  <span style={{
+                    fontSize: 'clamp(0.8rem, 2vw, 1.2rem)',
+                    padding: '0.2rem 0.8rem',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    background: 'rgba(22,140,131,0.1)',
+                    color: 'var(--ecell-teal, #168C83)',
+                    border: '1px solid rgba(22,140,131,0.2)'
+                  }}>
+                    Upcoming
                   </span>
                 )}
               </h1>
@@ -381,10 +411,13 @@ export default function EventDetail() {
                       <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Event Ended</div>
                       <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Thank you for participating!</div>
                     </div>
-                  ) : isPast ? (
+                  ) : isPast || event.status === 'active' ? (
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 700, color: TEAL, marginBottom: '0.25rem' }}>Event Started!</div>
-                      <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Join now to participate</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 700, color: TEAL, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 10px #4ade80', display: 'inline-block' }} />
+                        Event is Active!
+                      </div>
+                      <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Happening right now — participate now</div>
                     </div>
                   ) : (
                     <>

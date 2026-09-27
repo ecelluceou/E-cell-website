@@ -178,6 +178,7 @@ export default function ManageEvents() {
                 style={{ flex: 1, cursor: 'pointer' }}
               >
                 <option value="upcoming">Upcoming</option>
+                <option value="active">Active</option>
                 <option value="postponed">Postponed</option>
                 <option value="preponed">Preponed</option>
                 <option value="ended">Ended</option>
@@ -238,7 +239,7 @@ export default function ManageEvents() {
                   <h4 style={{ margin: '0 0 0.2rem 0', color: 'var(--text-primary)' }}>{event.title}</h4>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{event.date ? new Date(event.date).toLocaleDateString() : 'TBA'}</p>
-                    {event.status && event.status !== 'upcoming' && (
+                    {event.status && event.status !== 'upcoming' && event.status !== 'active' ? (
                       <span style={{
                         fontSize: '0.65rem',
                         padding: '0.1rem 0.4rem',
@@ -250,7 +251,23 @@ export default function ManageEvents() {
                       }}>
                         {event.status}
                       </span>
-                    )}
+                    ) : (event.status === 'active' || (event.date && new Date(event.date) <= new Date() && event.status !== 'ended')) ? (
+                      <span style={{
+                        fontSize: '0.65rem',
+                        padding: '0.1rem 0.45rem',
+                        borderRadius: '4px',
+                        fontWeight: 'bold',
+                        textTransform: 'uppercase',
+                        background: 'rgba(22,140,131,0.15)',
+                        color: 'var(--ecell-teal, #168C83)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}>
+                        <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#4ade80', display: 'inline-block' }} />
+                        Active
+                      </span>
+                    ) : null}
                   </div>
                 </div>
               </div>

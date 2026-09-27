@@ -53,10 +53,13 @@ export default function Profile() {
 
       const { data: regData } = await supabase
         .from('event_registrations')
-        .select('event_id')
+        .select('event_id, status')
         .eq('user_id', user.id);
       if (regData) {
-        const registered = regData.map(r => allEvents.find(e => e.id === r.event_id)).filter(Boolean);
+        const registered = regData.map(r => {
+          const ev = allEvents.find(e => e.id === r.event_id);
+          return ev ? { ...ev, regStatus: r.status } : null;
+        }).filter(Boolean);
         // Sort by date descending (closest first)
         setRegisteredEvents(registered.sort((a, b) => (new Date(b.date).getTime() || 0) - (new Date(a.date).getTime() || 0)));
       }
@@ -99,6 +102,35 @@ export default function Profile() {
   const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url;
   const joinedDate = profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently';
 
+  const getEventBadge = (ev) => {
+    const isPast = ev.date && new Date(ev.date) <= new Date();
+    if (ev.status === 'ended' || ev.regStatus === 'attended' || ev.regStatus === 'won') {
+      return {
+        label: 'Attended',
+        bg: 'var(--glass-bg)',
+        color: 'var(--text-muted)',
+        border: '1px solid var(--glass-border)',
+        isLive: false
+      };
+    }
+    if (isPast || ev.status === 'active') {
+      return {
+        label: 'Active',
+        bg: 'rgba(22, 140, 131, 0.18)',
+        color: 'var(--ecell-teal, #168C83)',
+        border: '1px solid rgba(22, 140, 131, 0.35)',
+        isLive: true
+      };
+    }
+    return {
+      label: 'Upcoming',
+      bg: 'rgba(22, 140, 131, 0.1)',
+      color: 'var(--ecell-teal, #168C83)',
+      border: '1px solid rgba(22, 140, 131, 0.2)',
+      isLive: false
+    };
+  };
+
   const profileData = {
     name: displayName,
     email: displayEmail,
@@ -108,8 +140,8 @@ export default function Profile() {
     dob: profile?.dob || "Not Provided",
     year: "Not Specified",
     joinedDate: joinedDate,
-    eventsAttended: registeredEvents.filter(e => new Date(e.date) < new Date()).length,
-    upcomingEvents: registeredEvents.filter(e => new Date(e.date) >= new Date()).length,
+    eventsAttended: registeredEvents.filter(e => e.regStatus === 'attended' || e.regStatus === 'won' || e.status === 'ended').length,
+    upcomingEvents: registeredEvents.filter(e => (!e.status || e.status !== 'ended') && e.regStatus !== 'attended' && e.regStatus !== 'won').length,
     savedEventsCount: savedEvents.length,
     avatarInitials: avatarInitials,
     avatarUrl: avatarUrl,
@@ -339,14 +371,33 @@ export default function Profile() {
                       <div style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-primary)', marginBottom: '0.15rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ev.title}</div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ev.date ? new Date(ev.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBA'}</div>
                     </div>
-                    <span className="event-status-badge" style={{
-                      padding: '0.15rem 0.55rem', borderRadius: '9999px', fontSize: '0.68rem', fontWeight: 700,
-                      background: new Date(ev.date) > new Date() ? 'rgba(22,140,131,0.1)' : 'var(--glass-bg)',
-                      color: new Date(ev.date) > new Date() ? 'var(--ecell-teal)' : 'var(--text-muted)',
-                      flexShrink: 0, whiteSpace: 'nowrap'
-                    }}>
-                      {new Date(ev.date) > new Date() ? 'Upcoming' : 'Attended'}
-                    </span>
+                    {(() => {
+                      const badge = getEventBadge(ev);
+                      return (
+                        <span className="event-status-badge" style={{
+                          padding: '0.18rem 0.6rem', borderRadius: '9999px', fontSize: '0.68rem', fontWeight: 700,
+                          background: badge.bg,
+                          color: badge.color,
+                          border: badge.border,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          flexShrink: 0, whiteSpace: 'nowrap'
+                        }}>
+                          {badge.isLive && (
+                            <span style={{
+                              width: '6px',
+                              height: '6px',
+                              borderRadius: '50%',
+                              background: '#4ade80',
+                              boxShadow: '0 0 6px #4ade80',
+                              display: 'inline-block'
+                            }} />
+                          )}
+                          {badge.label}
+                        </span>
+                      );
+                    })()}
                     <ChevronRight size={14} color="#ccc" style={{ flexShrink: 0 }} className="chevron-desktop" />
                   </motion.div>
                 ))}

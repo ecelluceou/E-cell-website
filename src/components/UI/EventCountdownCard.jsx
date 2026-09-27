@@ -197,13 +197,52 @@ export function EventCountdownCard({
           >
             Ended
           </motion.div>
-        ) : timeLeft > 0 && timeLeft < 86400 && (
+        ) : (timeLeft <= 0 && dateKnown) || status === 'active' ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="ecc-badge-urgent"
+            style={{
+              background: 'rgba(22, 140, 131, 0.85)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(74, 222, 128, 0.5)',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <span style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              background: '#4ade80',
+              boxShadow: '0 0 8px #4ade80',
+              display: 'inline-block'
+            }} />
+            Active
+          </motion.div>
+        ) : timeLeft > 0 && timeLeft < 86400 ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             className="ecc-badge-urgent"
           >
             Starts Soon!
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="ecc-badge-urgent"
+            style={{
+              background: 'rgba(22, 140, 131, 0.25)',
+              border: '1px solid rgba(22, 140, 131, 0.4)',
+              color: 'var(--ecell-teal, #168C83)',
+              backdropFilter: 'blur(8px)'
+            }}
+          >
+            Upcoming
           </motion.div>
         )}
       </motion.div>
@@ -270,8 +309,11 @@ export function EventCountdownCard({
           </motion.div>
         ) : (
           <motion.div variants={shouldAnimate ? childVariants : {}} className="ecc-started">
-            <div className="ecc-started-title">Event Started!</div>
-            <div className="ecc-started-subtitle">Join now to participate</div>
+            <div className="ecc-started-title" style={{ color: 'var(--ecell-teal, #168C83)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 10px #4ade80', display: 'inline-block' }} />
+              Event is Active!
+            </div>
+            <div className="ecc-started-subtitle">Happening right now — join to participate</div>
           </motion.div>
         )}
 
@@ -286,7 +328,7 @@ export function EventCountdownCard({
           className={dateKnown && status !== 'ended' ? "ecc-button" : "ecc-button ecc-button-tba"}
           style={dateKnown && status !== 'ended' ? {} : { cursor: 'default', pointerEvents: 'none', background: status === 'ended' ? 'rgba(255,255,255,0.05)' : '' }}
         >
-          {status === 'ended' ? "Event Ended" : !dateKnown ? "Registrations are yet to open" : (timeLeft > 0 ? "Reserve Your Spot" : "Join Event")}
+          {status === 'ended' ? "Event Ended" : !dateKnown ? "Registrations are yet to open" : (timeLeft > 0 ? "Reserve Your Spot" : "Join Event (Active)")}
         </motion.button>
       </div>
     </motion.div>
