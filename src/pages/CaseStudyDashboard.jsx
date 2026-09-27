@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, User, Copy, Share2, LogOut, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
 import { useCaseStudy } from '../hooks/useCaseStudy';
 import { Loader } from '../components/UI/Loader';
 
@@ -12,7 +11,6 @@ const TEAL = '#168C83';
 
 export default function CaseStudyDashboard() {
   const { teamId } = useParams();
-  const { user } = useAuth();
   const navigate = useNavigate();
   const { removeMember, deleteTeam, loading: actionLoading, error: actionError } = useCaseStudy();
   
@@ -104,7 +102,8 @@ export default function CaseStudyDashboard() {
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  const isCurrentUserLead = members.some(m => m.user_id === user?.id && m.is_lead);
+  // Leader = the member with is_lead === true (no user_id in schema)
+  const isCurrentUserLead = members.some(m => m.is_lead === true);
 
   const handleRemoveMember = async (memberId) => {
     if (window.confirm("Are you sure you want to remove this member?")) {
@@ -207,8 +206,8 @@ export default function CaseStudyDashboard() {
                   <div style={{ flex: 1 }}>
                     {isFilled ? (
                       <>
-                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          {member.full_name} {member.user_id === user?.id && <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px', color: 'var(--text-muted)' }}>You</span>}
+                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'white' }}>
+                          {member.full_name}
                         </div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{member.college}</div>
                       </>

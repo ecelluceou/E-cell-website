@@ -28,7 +28,7 @@ export default function CaseStudyRegistrationModal({ isOpen, onClose }) {
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
-    const res = await createTeam(formData.teamName, formData, user?.id);
+    const res = await createTeam(formData.teamName, formData);
     if (res.success) {
       onClose();
       navigate(`/events/case-study/dashboard/${res.teamId}`);
@@ -37,7 +37,7 @@ export default function CaseStudyRegistrationModal({ isOpen, onClose }) {
 
   const handleJoinSubmit = async (e) => {
     e.preventDefault();
-    const res = await joinTeam(formData.teamCode, formData, user?.id);
+    const res = await joinTeam(formData.teamCode, formData);
     if (res.success) {
       onClose();
       navigate(`/events/case-study/dashboard/${res.teamId}`);

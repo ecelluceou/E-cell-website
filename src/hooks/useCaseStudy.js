@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
-// Helper to generate a 6-character unambiguous code
+// Helper to generate a 6-character unambiguous code (no O, 0, I, 1)
 const generateTeamCode = () => {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Omitted O, 0, I, 1
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let result = 'CS-';
   for (let i = 0; i < 4; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -15,42 +15,35 @@ export function useCaseStudy() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const createTeam = useCallback(async (teamName, leadDetails, userId) => {
+  // -- Create Team ------------------------------------------------------------
+  const createTeam = useCallback(async (teamName, leadDetails) => {
     setLoading(true);
     setError(null);
     try {
       let teamCode = generateTeamCode();
       let teamId = null;
-      
+
       for (let attempt = 0; attempt < 3; attempt++) {
         const { data: newTeam, error: teamError } = await supabase
           .from('case_study_teams')
-          .insert({
-            team_name: teamName,
-            team_code: teamCode
-          })
+          .insert({ team_name: teamName, team_code: teamCode })
           .select()
           .single();
-          
+
         if (teamError) {
-          if (teamError.code === '23505') { 
-            teamCode = generateTeamCode();
-            continue;
-          }
+          if (teamError.code === '23505') { teamCode = generateTeamCode(); continue; }
           throw teamError;
         }
-        
         teamId = newTeam.id;
         break;
       }
-      
+
       if (!teamId) throw new Error('Failed to generate a unique team code. Please try again.');
 
       const { error: memberError } = await supabase
         .from('case_study_members')
         .insert({
           team_id: teamId,
-          user_id: userId || null,
           full_name: leadDetails.name,
           email: leadDetails.email,
           phone: leadDetails.phone,
@@ -66,7 +59,7 @@ export function useCaseStudy() {
 
       return { success: true, teamId, teamCode };
     } catch (err) {
-      console.error('Error creating team:', err);
+      console.error('createTeam error:', err);
       setError(err.message);
       return { success: false, error: err.message };
     } finally {
@@ -74,39 +67,46 @@ export function useCaseStudy() {
     }
   }, []);
 
-  const joinTeam = useCallback(async (teamCode, memberDetails, userId) => {
+  // -- Join Team --------------------------------------------------------------
+  const joinTeam = useCallback(async (teamCode, memberDetails) => {
     setLoading(true);
     setError(null);
     try {
       const { data: team, error: teamError } = await supabase
         .from('case_study_teams')
-        .select('id')
+        .select('id, max_members, is_locked')
         .eq('team_code', teamCode.toUpperCase())
         .single();
-        
-      if (teamError || !team) {
-        throw new Error('Invalid team code. Please check and try again.');
-      }
 
-      const { data, error: rpcError } = await supabase.rpc('join_case_study_team', {
-        p_team_id: team.id,
-        p_user_id: userId || null,
-        p_full_name: memberDetails.name,
-        p_email: memberDetails.email,
-        p_phone: memberDetails.phone,
-        p_college: memberDetails.college,
-        p_roll_number: memberDetails.rollNumber
-      });
+      if (teamError || !team) throw new Error('Invalid team code. Please check and try again.');
+      if (team.is_locked) throw new Error('This team is locked and no longer accepting members.');
 
-      if (rpcError) throw rpcError;
+      const { count, error: countError } = await supabase
+        .from('case_study_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('team_id', team.id);
 
-      if (data && data.success === false) {
-          throw new Error(data.message || 'Failed to join team');
-      }
+      if (countError) throw countError;
 
+      const maxSlots = team.max_members || 5;
+      if (count >= maxSlots) throw new Error('This team is already full (max 5 members).');
+
+      const { error: memberError } = await supabase
+        .from('case_study_members')
+        .insert({
+          team_id: team.id,
+          full_name: memberDetails.name,
+          email: memberDetails.email,
+          phone: memberDetails.phone,
+          college: memberDetails.college,
+          roll_number: memberDetails.rollNumber,
+          is_lead: false
+        });
+
+      if (memberError) throw memberError;
       return { success: true, teamId: team.id };
     } catch (err) {
-      console.error('Error joining team:', err);
+      console.error('joinTeam error:', err);
       setError(err.message);
       return { success: false, error: err.message };
     } finally {
@@ -114,15 +114,12 @@ export function useCaseStudy() {
     }
   }, []);
 
+  // -- Remove Member ----------------------------------------------------------
   const removeMember = useCallback(async (memberId) => {
     setLoading(true);
     setError(null);
     try {
-      const { error } = await supabase
-        .from('case_study_members')
-        .delete()
-        .eq('id', memberId);
-        
+      const { error } = await supabase.from('case_study_members').delete().eq('id', memberId);
       if (error) throw error;
       return { success: true };
     } catch (err) {
@@ -133,16 +130,17 @@ export function useCaseStudy() {
     }
   }, []);
 
+  // -- Delete Team ------------------------------------------------------------
   const deleteTeam = useCallback(async (teamId) => {
     setLoading(true);
     setError(null);
     try {
-      await supabase.from('case_study_members').delete().eq('team_id', teamId);
+      const { error: membersError } = await supabase
+        .from('case_study_members').delete().eq('team_id', teamId);
+      if (membersError) throw membersError;
+
       const { error } = await supabase
-        .from('case_study_teams')
-        .delete()
-        .eq('id', teamId);
-        
+        .from('case_study_teams').delete().eq('id', teamId);
       if (error) throw error;
       return { success: true };
     } catch (err) {
@@ -153,13 +151,5 @@ export function useCaseStudy() {
     }
   }, []);
 
-  return {
-    createTeam,
-    joinTeam,
-    removeMember,
-    deleteTeam,
-    loading,
-    error,
-    setError
-  };
+  return { createTeam, joinTeam, removeMember, deleteTeam, loading, error, setError };
 }
