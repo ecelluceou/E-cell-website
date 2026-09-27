@@ -30,6 +30,7 @@ export default function ManageEvents() {
       image: '',
       status: 'upcoming',
       registration_status: 'registrations_open',
+      show_participant_count: true,
       prize: '',
       team_size: ''
     };
@@ -121,7 +122,8 @@ export default function ManageEvents() {
       date: event.date ? new Date(event.date).toISOString().slice(0, 16) : '',
       highlights: event.highlights?.length ? event.highlights : [''],
       tags: event.tags?.length ? event.tags : [''],
-      status: event.status || 'upcoming'
+      status: event.status || 'upcoming',
+      show_participant_count: event.show_participant_count !== false
     });
     setIsEditing(true);
   };
@@ -188,8 +190,8 @@ export default function ManageEvents() {
               </select>
             </div>
 
-            {/* Registration Status + Prize + Team Size */}
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            {/* Registration Status + Show Participant Count */}
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <select 
                 value={formData.registration_status} 
                 onChange={e => setFormData({...formData, registration_status: e.target.value})} 
@@ -201,6 +203,15 @@ export default function ManageEvents() {
                 <option value="coming_soon">⏳ Coming Soon</option>
                 <option value="free_entry">✨ Free Entry</option>
               </select>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', padding: '0.8rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <input 
+                  type="checkbox" 
+                  checked={formData.show_participant_count} 
+                  onChange={e => setFormData({...formData, show_participant_count: e.target.checked})} 
+                />
+                Show Participant Count
+              </label>
             </div>
 
             <div style={{ display: 'flex', gap: '1rem' }}>

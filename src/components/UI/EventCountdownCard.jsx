@@ -8,6 +8,7 @@ export function EventCountdownCard({
   date,
   image = "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=600&fit=crop",
   attendees = 42,
+  showParticipantCount = true,
   onJoin,
   onClick,
   enableAnimations = true,
@@ -267,10 +268,12 @@ export function EventCountdownCard({
               <Calendar size={16} />
               <span>{dateKnown ? parsedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Date TBA'}</span>
             </div>
-            <div className="ecc-meta-item">
-              <Users size={16} />
-              <span>{attendees} registered</span>
-            </div>
+            {showParticipantCount && (
+              <div className="ecc-meta-item">
+                <Users size={16} />
+                <span>{attendees} registered</span>
+              </div>
+            )}
           </div>
 
           {/* Registration Status Badge */}

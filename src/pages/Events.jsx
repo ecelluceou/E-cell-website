@@ -198,6 +198,7 @@ export default function Events() {
                 status={event.status}
                 isRegistered={userRegistrations.has(event.id)}
                 registrationStatus={event.registration_status}
+                showParticipantCount={event.show_participant_count !== false}
                 onJoin={() => navigate(`/events/${event.id}`)}
                 onClick={() => navigate(`/events/${event.id}`)}
               />

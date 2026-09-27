@@ -345,7 +345,7 @@ export default function EventDetail() {
               event.date   && { icon: <Calendar size={16} />, text: new Date(event.date).toLocaleDateString('en-IN', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }), color: VERMILION },
               event.time   && { icon: <Clock size={16} />,    text: event.time,     color: TEAL   },
               event.location && { icon: <MapPin size={16} />, text: event.location, color: COBALT },
-              { icon: <Users size={16} />, text: `${count} registered`,   color: SAFFRON },
+              event.show_participant_count !== false && { icon: <Users size={16} />, text: `${count} registered`,   color: SAFFRON },
             ].filter(Boolean).map((item, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
                 <span style={{ color: item.color, display: 'flex', flexShrink: 0 }}>{item.icon}</span>
@@ -515,23 +515,25 @@ export default function EventDetail() {
               )}
 
               {/* Attendees */}
-              <div style={{
-                ...card,
-                padding: '1rem 1.25rem',
-                display: 'flex', alignItems: 'center', gap: '0.85rem'
-              }}>
+              {event.show_participant_count !== false && (
                 <div style={{
-                  width: '40px', height: '40px', borderRadius: '50%',
-                  background: 'rgba(228,71,46,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0
+                  ...card,
+                  padding: '1rem 1.25rem',
+                  display: 'flex', alignItems: 'center', gap: '0.85rem'
                 }}>
-                  <Users size={18} color={VERMILION} />
+                  <div style={{
+                    width: '40px', height: '40px', borderRadius: '50%',
+                    background: 'rgba(228,71,46,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <Users size={18} color={VERMILION} />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary)', lineHeight: 1 }}>{count}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>Registered</div>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary)', lineHeight: 1 }}>{count}</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>Registered</div>
-                </div>
-              </div>
+              )}
 
               {/* Registrations notice */}
               {event.status === 'ended' ? (
