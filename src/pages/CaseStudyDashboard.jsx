@@ -132,14 +132,14 @@ export default function CaseStudyDashboard() {
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         
         {/* Header */}
-        <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '24px', padding: '2rem', marginBottom: '2rem', backdropFilter: 'blur(16px)', textAlign: 'center' }}>
-          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.5rem)', fontWeight: 800, margin: '0 0 0.5rem 0' }}>{team.team_name}</h1>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '1.1rem' }}>Case Study Registration Dashboard</p>
+        <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '24px', padding: 'clamp(1.25rem, 4vw, 2rem)', marginBottom: '2rem', backdropFilter: 'blur(16px)', textAlign: 'center' }}>
+          <h1 style={{ fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', fontWeight: 800, margin: '0 0 0.5rem 0' }}>{team.team_name}</h1>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: 'clamp(0.95rem, 3vw, 1.1rem)' }}>Case Study Registration Dashboard</p>
           
-          <div style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', border: '1px dashed var(--glass-border)', borderRadius: '16px', padding: '1rem 1.5rem', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.3)', border: '1px dashed var(--glass-border)', borderRadius: '16px', padding: 'clamp(0.75rem, 3vw, 1rem) clamp(1rem, 4vw, 1.5rem)', gap: 'clamp(0.75rem, 3vw, 1.5rem)' }}>
             <div>
               <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-secondary)', fontWeight: 700, letterSpacing: '0.1em', marginBottom: '0.2rem' }}>Team Code</div>
-              <div style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '0.15em', color: TEAL }}>{team.team_code}</div>
+              <div style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 800, letterSpacing: '0.15em', color: TEAL }}>{team.team_code}</div>
             </div>
             
             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -160,7 +160,7 @@ export default function CaseStudyDashboard() {
         )}
 
         {/* Roster */}
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', paddingLeft: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.5rem)', fontWeight: 700, marginBottom: '1.5rem', paddingLeft: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
           Team Roster ({members.length}/5)
           
           {isCurrentUserLead && (
@@ -191,8 +191,8 @@ export default function CaseStudyDashboard() {
                     background: isFilled ? 'var(--glass-bg)' : 'rgba(255,255,255,0.02)',
                     border: isFilled ? (member.is_lead ? `1px solid ${TEAL}` : '1px solid var(--glass-border)') : '1px dashed rgba(255,255,255,0.1)',
                     borderRadius: '16px',
-                    padding: '1.25rem',
-                    display: 'flex', alignItems: 'center', gap: '1rem',
+                    padding: 'clamp(1rem, 3vw, 1.25rem)',
+                    display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '1rem',
                     transition: 'all 0.3s'
                   }}
                 >
@@ -205,10 +205,10 @@ export default function CaseStudyDashboard() {
                     {isFilled ? (member.is_lead ? <Shield size={24} /> : <User size={24} />) : <User size={24} />}
                   </div>
 
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: '1 1 min(100%, 200px)' }}>
                     {isFilled ? (
                       <>
-                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'white' }}>
+                        <div style={{ fontWeight: 700, fontSize: 'clamp(1rem, 3vw, 1.1rem)', color: 'white' }}>
                           {member.full_name}
                         </div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{member.college}</div>

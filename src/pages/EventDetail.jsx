@@ -584,22 +584,22 @@ export default function EventDetail() {
 
       {/* Mini Dashboard for Case Study */}
       {isCaseStudy && caseStudyTeam && (
-        <div style={{ maxWidth: '1000px', margin: '3rem auto 0 auto', padding: '0 1rem' }}>
-          <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '24px', padding: '2rem', backdropFilter: 'blur(16px)' }}>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 1.5rem 0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ maxWidth: '1000px', margin: '3rem auto 0 auto', padding: '0 clamp(1rem, 4vw, 2rem)' }}>
+          <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '24px', padding: 'clamp(1.25rem, 4vw, 2rem)', backdropFilter: 'blur(16px)' }}>
+            <h3 style={{ fontSize: 'clamp(1.25rem, 4vw, 1.5rem)', fontWeight: 800, margin: '0 0 1.5rem 0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <Users size={24} color={TEAL} /> Your Case Study Team
             </h3>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '1.5rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: 'clamp(1rem, 3vw, 1.5rem)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Team Name</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>{caseStudyTeam.team_name}</div>
+                <div style={{ fontSize: 'clamp(1.25rem, 4vw, 1.5rem)', fontWeight: 700, color: 'var(--text-primary)' }}>{caseStudyTeam.team_name}</div>
               </div>
               
-              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '16px', border: '1px dashed var(--glass-border)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: 'clamp(1rem, 3vw, 1.5rem)', borderRadius: '16px', border: '1px dashed var(--glass-border)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Invite Code</div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: TEAL, letterSpacing: '0.1em' }}>{caseStudyTeam.team_code}</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 800, color: TEAL, letterSpacing: '0.1em' }}>{caseStudyTeam.team_code}</div>
                   <button onClick={() => { navigator.clipboard.writeText(caseStudyTeam.team_code); alert('Team Code copied!'); }} style={{ background: 'rgba(22,140,131,0.1)', border: `1px solid ${TEAL}`, padding: '0.5rem', borderRadius: '8px', color: TEAL, cursor: 'pointer' }} title="Copy Code">
                     <Copy size={18} />
                   </button>
