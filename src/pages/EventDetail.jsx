@@ -637,7 +637,8 @@ export default function EventDetail() {
 
       <CaseStudyRegistrationModal 
         isOpen={isCaseStudyModalOpen} 
-        onClose={() => setIsCaseStudyModalOpen(false)} 
+        onClose={() => setIsCaseStudyModalOpen(false)}
+        eventId={id}
       />
     </div>
   );

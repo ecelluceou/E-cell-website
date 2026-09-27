@@ -21,17 +21,20 @@ export function useEventRegistration(eventId) {
     let finalCount = total ?? 0;
 
     // Add case study team members count (combined leads + members) if any exist
-    const { data: teamsData } = await supabase
+    const { data: allTeamsData } = await supabase
       .from('case_study_teams')
-      .select('id')
-      .eq('event_id', eventId);
+      .select('id, event_id');
       
-    if (teamsData && teamsData.length > 0) {
-      const teamIds = teamsData.map(t => t.id);
+    // Include teams that explicitly belong to this event OR have no event_id (legacy data)
+    const relevantTeamIds = (allTeamsData || [])
+      .filter(t => t.event_id === eventId || t.event_id === null || t.event_id === undefined)
+      .map(t => t.id);
+      
+    if (relevantTeamIds.length > 0) {
       const { count: memberCount } = await supabase
         .from('case_study_members')
         .select('*', { count: 'exact', head: true })
-        .in('team_id', teamIds);
+        .in('team_id', relevantTeamIds);
       finalCount += (memberCount ?? 0);
     }
 

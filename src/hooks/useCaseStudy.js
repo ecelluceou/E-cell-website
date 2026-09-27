@@ -16,7 +16,7 @@ export function useCaseStudy() {
   const [error, setError] = useState(null);
 
   // -- Create Team ------------------------------------------------------------
-  const createTeam = useCallback(async (teamName, leadDetails) => {
+  const createTeam = useCallback(async (teamName, leadDetails, eventId) => {
     setLoading(true);
     setError(null);
     try {
@@ -26,7 +26,7 @@ export function useCaseStudy() {
       for (let attempt = 0; attempt < 3; attempt++) {
         const { data: newTeam, error: teamError } = await supabase
           .from('case_study_teams')
-          .insert({ team_name: teamName, team_code: teamCode })
+          .insert({ team_name: teamName, team_code: teamCode, event_id: eventId })
           .select()
           .single();
 

@@ -46,17 +46,20 @@ export default function Events() {
               .eq('event_id', ev.id);
             let finalCount = count || 0;
             if (ev.title?.toLowerCase().includes('case study')) {
-              const { data: teamsData } = await supabase
+              const { data: allTeams } = await supabase
                 .from('case_study_teams')
-                .select('id')
-                .eq('event_id', ev.id);
+                .select('id, event_id');
                 
-              if (teamsData && teamsData.length > 0) {
-                const teamIds = teamsData.map(t => t.id);
+              // Include teams that belong to this event OR have no event_id (legacy data)
+              const relevantIds = (allTeams || [])
+                .filter(t => t.event_id === ev.id || t.event_id === null || t.event_id === undefined)
+                .map(t => t.id);
+                
+              if (relevantIds.length > 0) {
                 const { count: memberCount } = await supabase
                   .from('case_study_members')
                   .select('*', { count: 'exact', head: true })
-                  .in('team_id', teamIds);
+                  .in('team_id', relevantIds);
                 finalCount += (memberCount || 0);
               }
             }

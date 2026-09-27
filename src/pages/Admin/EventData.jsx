@@ -53,19 +53,25 @@ export default function EventData() {
       }
 
       if (isCaseStudy) {
-        // Fetch from case study tables
+        // Fetch from case study tables - filter by event_id (works after migration)
+        // Also fetch teams without event_id set (legacy data) as fallback
         const { data: teamData, error: teamError } = await supabase
           .from('case_study_teams')
           .select(`
+            id,
             team_name,
+            event_id,
             case_study_members ( id, full_name, email, college, phone, created_at, status, is_lead )
-          `)
-          .eq('event_id', selectedEventId);
+          `);
           
         if (teamError) {
           console.error("Error fetching case study registrations:", teamError);
         } else {
-          (teamData || []).forEach(team => {
+          // Filter: include teams that belong to this event OR have no event_id (legacy)
+          const relevantTeams = (teamData || []).filter(
+            t => t.event_id === selectedEventId || t.event_id === null || t.event_id === undefined
+          );
+          relevantTeams.forEach(team => {
             if (team.case_study_members) {
               team.case_study_members.forEach(member => {
                 allRegs.push({
@@ -87,6 +93,8 @@ export default function EventData() {
           });
         }
       }
+
+
 
       // Sort combined array by date descending
       allRegs.sort((a, b) => new Date(b.registered_at || 0) - new Date(a.registered_at || 0));

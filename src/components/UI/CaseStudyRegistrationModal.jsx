@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 const VERMILION = '#E4472E';
 const TEAL = '#168C83';
 
-export default function CaseStudyRegistrationModal({ isOpen, onClose }) {
+export default function CaseStudyRegistrationModal({ isOpen, onClose, eventId }) {
   const [mode, setMode] = useState('select'); // 'select', 'create', 'join'
   const { createTeam, joinTeam, loading, error, setError } = useCaseStudy();
   const { user } = useAuth();
@@ -28,7 +28,7 @@ export default function CaseStudyRegistrationModal({ isOpen, onClose }) {
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
-    const res = await createTeam(formData.teamName, { ...formData, email: user?.email || formData.email });
+    const res = await createTeam(formData.teamName, { ...formData, email: user?.email || formData.email }, eventId);
     if (res.success) {
       onClose();
       navigate(`/events/case-study/dashboard/${res.teamId}`);
