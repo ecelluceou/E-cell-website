@@ -33,9 +33,28 @@ export default function EventData() {
       const selectedEvent = events.find(ev => ev.id === selectedEventId);
       const isCaseStudy = selectedEvent?.title?.toLowerCase().includes('case study');
 
+      let allRegs = [];
+
+      // Always fetch regular event_registrations (legacy or fallback registrations)
+      const { data: regularData, error: regularError } = await supabase
+        .from('event_registrations')
+        .select(`
+          id,
+          status,
+          registered_at,
+          profiles ( id, full_name, email, college, phone )
+        `)
+        .eq('event_id', selectedEventId);
+
+      if (regularError) {
+        console.error("Error fetching regular registrations:", regularError);
+      } else if (regularData) {
+        allRegs = [...regularData];
+      }
+
       if (isCaseStudy) {
         // Fetch from case study tables
-        const { data: teamData, error } = await supabase
+        const { data: teamData, error: teamError } = await supabase
           .from('case_study_teams')
           .select(`
             team_name,
@@ -43,14 +62,13 @@ export default function EventData() {
           `)
           .eq('event_id', selectedEventId);
           
-        if (error) {
-          console.error("Error fetching case study registrations:", error);
+        if (teamError) {
+          console.error("Error fetching case study registrations:", teamError);
         } else {
-          const caseStudyRegs = [];
           (teamData || []).forEach(team => {
             if (team.case_study_members) {
               team.case_study_members.forEach(member => {
-                caseStudyRegs.push({
+                allRegs.push({
                   id: member.id,
                   status: member.status || 'registered',
                   registered_at: member.created_at,
@@ -66,29 +84,13 @@ export default function EventData() {
               });
             }
           });
-          // Sort by date descending
-          caseStudyRegs.sort((a, b) => new Date(b.registered_at) - new Date(a.registered_at));
-          setRegistrations(caseStudyRegs);
-        }
-      } else {
-        // Fetch from regular event_registrations
-        const { data, error } = await supabase
-          .from('event_registrations')
-          .select(`
-            id,
-            status,
-            registered_at,
-            profiles ( id, full_name, email, college, phone )
-          `)
-          .eq('event_id', selectedEventId)
-          .order('registered_at', { ascending: false });
-
-        if (error) {
-          console.error("Error fetching registrations:", error);
-        } else {
-          setRegistrations(data || []);
         }
       }
+
+      // Sort combined array by date descending
+      allRegs.sort((a, b) => new Date(b.registered_at || 0) - new Date(a.registered_at || 0));
+      setRegistrations(allRegs);
+      
       setLoading(false);
     }
     fetchRegistrations();

@@ -12,12 +12,30 @@ export function useEventRegistration(eventId) {
   const checkStatus = useCallback(async () => {
     setChecking(true);
 
-    // Get total attendee count
+    // Get total attendee count from regular registrations
     const { count: total } = await supabase
       .from('event_registrations')
       .select('*', { count: 'exact', head: true })
       .eq('event_id', eventId);
-    setCount(total ?? 0);
+      
+    let finalCount = total ?? 0;
+
+    // Add case study team members count (combined leads + members) if any exist
+    const { data: teamsData } = await supabase
+      .from('case_study_teams')
+      .select('id')
+      .eq('event_id', eventId);
+      
+    if (teamsData && teamsData.length > 0) {
+      const teamIds = teamsData.map(t => t.id);
+      const { count: memberCount } = await supabase
+        .from('case_study_members')
+        .select('*', { count: 'exact', head: true })
+        .in('team_id', teamIds);
+      finalCount += (memberCount ?? 0);
+    }
+
+    setCount(finalCount);
 
     // Check if this user is registered
     if (user) {

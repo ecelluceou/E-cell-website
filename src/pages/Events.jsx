@@ -44,7 +44,23 @@ export default function Events() {
               .from('event_registrations')
               .select('*', { count: 'exact', head: true })
               .eq('event_id', ev.id);
-            return { ...ev, attendees: count || 0 };
+            let finalCount = count || 0;
+            if (ev.title?.toLowerCase().includes('case study')) {
+              const { data: teamsData } = await supabase
+                .from('case_study_teams')
+                .select('id')
+                .eq('event_id', ev.id);
+                
+              if (teamsData && teamsData.length > 0) {
+                const teamIds = teamsData.map(t => t.id);
+                const { count: memberCount } = await supabase
+                  .from('case_study_members')
+                  .select('*', { count: 'exact', head: true })
+                  .in('team_id', teamIds);
+                finalCount += (memberCount || 0);
+              }
+            }
+            return { ...ev, attendees: finalCount };
           })
         );
         
