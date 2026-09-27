@@ -103,7 +103,7 @@ export function useCaseStudy() {
     setLoading(true);
     setError(null);
     try {
-      const { error } = await supabase.from('case_study_members').delete().eq('id', memberId);
+      const { error } = await supabase.rpc('remove_case_study_member', { p_member_id: memberId });
       if (error) throw error;
       return { success: true };
     } catch (err) {
@@ -119,12 +119,7 @@ export function useCaseStudy() {
     setLoading(true);
     setError(null);
     try {
-      const { error: membersError } = await supabase
-        .from('case_study_members').delete().eq('team_id', teamId);
-      if (membersError) throw membersError;
-
-      const { error } = await supabase
-        .from('case_study_teams').delete().eq('id', teamId);
+      const { error } = await supabase.rpc('delete_case_study_team', { p_team_id: teamId });
       if (error) throw error;
       return { success: true };
     } catch (err) {
