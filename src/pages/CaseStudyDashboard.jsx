@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, User, Copy, Share2, LogOut, Trash2 } from 'lucide-react';
+import { Shield, User, Copy, Share2, LogOut, Trash2, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useCaseStudy } from '../hooks/useCaseStudy';
@@ -131,6 +131,12 @@ export default function CaseStudyDashboard() {
   return (
     <div style={{ minHeight: '100vh', paddingTop: '100px', paddingBottom: '4rem', paddingInline: '1rem', color: 'white' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <button 
+          onClick={() => navigate(team?.event_id ? `/events/${team.event_id}` : '/events')}
+          style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginBottom: '1.5rem', fontSize: '0.9rem', padding: 0 }}
+        >
+          <ArrowLeft size={16} /> Back to Event
+        </button>
         
         {/* Header */}
         <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '24px', padding: 'clamp(1.25rem, 4vw, 2rem)', marginBottom: '2rem', backdropFilter: 'blur(16px)', textAlign: 'center' }}>
