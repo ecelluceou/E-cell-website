@@ -102,8 +102,8 @@ export default function CaseStudyDashboard() {
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  // Leader = the member with is_lead === true (no user_id in schema)
-  const isCurrentUserLead = members.some(m => m.is_lead === true);
+  // Leader = the member with is_lead === true AND matching the current user's email
+  const isCurrentUserLead = members.some(m => m.is_lead === true && m.email === user?.email);
 
   const handleRemoveMember = async (memberId) => {
     if (window.confirm("Are you sure you want to remove this member?")) {
