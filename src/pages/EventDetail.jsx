@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft, Calendar, Clock, Users, MapPin, Tag,
-  CheckCircle, Share2, BookmarkPlus, Trophy
+  CheckCircle, Share2, BookmarkPlus, Trophy, Copy, ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useEventRegistration } from '../hooks/useEventRegistration';
@@ -58,7 +58,30 @@ export default function EventDetail() {
   const [timeLeft, setTimeLeft] = useState(-1);
   const [winners, setWinners] = useState([]);
   const [isCaseStudyModalOpen, setIsCaseStudyModalOpen] = useState(false);
+  const [caseStudyTeam, setCaseStudyTeam] = useState(null);
   const isCaseStudy = event?.title?.toLowerCase().includes('case study');
+
+  useEffect(() => {
+    async function fetchCaseStudyTeam() {
+      if (isCaseStudy && user?.email) {
+        // Fetch member matching user email, join with team
+        const { data, error } = await supabase
+          .from('case_study_members')
+          .select('team_id, case_study_teams(team_name, team_code)')
+          .eq('email', user.email)
+          .single();
+          
+        if (data && !error) {
+          setCaseStudyTeam({
+            team_id: data.team_id,
+            team_name: data.case_study_teams?.team_name,
+            team_code: data.case_study_teams?.team_code
+          });
+        }
+      }
+    }
+    fetchCaseStudyTeam();
+  }, [isCaseStudy, user?.email]);
 
   useEffect(() => {
     async function fetchEvent() {
@@ -484,7 +507,11 @@ export default function EventDetail() {
                   onClick={async () => {
                     if (!user) { navigate('/auth'); return; }
                     if (isCaseStudy) {
-                      setIsCaseStudyModalOpen(true);
+                      if (caseStudyTeam) {
+                        navigate(`/events/case-study/dashboard/${caseStudyTeam.team_id}`);
+                      } else {
+                        setIsCaseStudyModalOpen(true);
+                      }
                       return;
                     }
                     if (isRegistered) { await unregister(); } else { await register(); }
@@ -501,11 +528,11 @@ export default function EventDetail() {
                     fontWeight: 700,
                     fontSize: '0.95rem',
                     transition: 'all 0.25s ease',
-                    background: isRegistered
+                    background: (isRegistered || caseStudyTeam)
                       ? 'rgba(22,140,131,0.12)'
                       : '#E4472E',
-                    color: isRegistered ? '#168C83' : 'white',
-                    border: isRegistered ? '1px solid rgba(22,140,131,0.3)' : '1px solid transparent',
+                    color: (isRegistered || caseStudyTeam) ? '#168C83' : 'white',
+                    border: (isRegistered || caseStudyTeam) ? '1px solid rgba(22,140,131,0.3)' : '1px solid transparent',
                     opacity: regLoading || checking ? 0.7 : 1,
                   }}
                 >
@@ -515,9 +542,11 @@ export default function EventDetail() {
                       ? 'Processing...'
                       : !user
                         ? '🔒 Sign in to Register'
-                        : isRegistered
-                          ? '✓ Registered — Click to Cancel'
-                          : isCaseStudy ? 'Register for Case Study →' : 'Reserve Your Spot →'}
+                        : caseStudyTeam
+                          ? 'Go to Team Dashboard →'
+                          : isRegistered
+                            ? '✓ Registered — Click to Cancel'
+                            : isCaseStudy ? 'Register for Case Study →' : 'Reserve Your Spot →'}
                 </motion.button>
               ) : (
                 <div style={{
@@ -552,6 +581,43 @@ export default function EventDetail() {
           </div>
         </motion.div>
       </div>
+
+      {/* Mini Dashboard for Case Study */}
+      {isCaseStudy && caseStudyTeam && (
+        <div style={{ maxWidth: '1000px', margin: '3rem auto 0 auto', padding: '0 1rem' }}>
+          <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '24px', padding: '2rem', backdropFilter: 'blur(16px)' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, margin: '0 0 1.5rem 0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <Users size={24} color={TEAL} /> Your Case Study Team
+            </h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Team Name</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>{caseStudyTeam.team_name}</div>
+              </div>
+              
+              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '16px', border: '1px dashed var(--glass-border)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Invite Code</div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+                  <div style={{ fontSize: '1.75rem', fontWeight: 800, color: TEAL, letterSpacing: '0.1em' }}>{caseStudyTeam.team_code}</div>
+                  <button onClick={() => { navigator.clipboard.writeText(caseStudyTeam.team_code); alert('Team Code copied!'); }} style={{ background: 'rgba(22,140,131,0.1)', border: `1px solid ${TEAL}`, padding: '0.5rem', borderRadius: '8px', color: TEAL, cursor: 'pointer' }} title="Copy Code">
+                    <Copy size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => navigate(`/events/case-study/dashboard/${caseStudyTeam.team_id}`)}
+                style={{ background: VERMILION, color: 'white', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              >
+                Open Full Dashboard <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <CaseStudyRegistrationModal 
         isOpen={isCaseStudyModalOpen} 

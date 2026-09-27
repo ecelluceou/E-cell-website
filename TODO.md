@@ -12,5 +12,9 @@
   - Verify automated build triggers on Vercel Hobby tier without collaboration block.
 
 ## Backlog / Enhancements
+- [ ] **Case Study Registration & Dashboard:**
+  - Implement Create/Join Team workflows.
+  - Real-time dashboard showing 5 capacity slots.
+  - **Leader Controls:** Allow team leader to remove members or delete the entire team.
 - [ ] Upload banner for "Building a Startup? E-Cell Wants to Help!" initiative from Admin Panel.
 - [ ] Configure Google OAuth Consent Screen branding (App name: E-Cell UCEOU + logo).
