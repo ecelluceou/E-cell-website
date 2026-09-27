@@ -26,7 +26,7 @@ export function useCaseStudy() {
         const { data: newTeam, error: teamError } = await supabase
           .from('case_study_teams')
           .insert({
-            name: teamName,
+            team_name: teamName,
             team_code: teamCode
           })
           .select()
@@ -51,7 +51,7 @@ export function useCaseStudy() {
         .insert({
           team_id: teamId,
           user_id: userId || null,
-          name: leadDetails.name,
+          full_name: leadDetails.name,
           email: leadDetails.email,
           phone: leadDetails.phone,
           college: leadDetails.college,
@@ -91,7 +91,7 @@ export function useCaseStudy() {
       const { data, error: rpcError } = await supabase.rpc('join_case_study_team', {
         p_team_id: team.id,
         p_user_id: userId || null,
-        p_name: memberDetails.name,
+        p_full_name: memberDetails.name,
         p_email: memberDetails.email,
         p_phone: memberDetails.phone,
         p_college: memberDetails.college,

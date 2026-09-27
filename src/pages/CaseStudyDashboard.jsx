@@ -100,7 +100,7 @@ export default function CaseStudyDashboard() {
   };
 
   const handleShareWhatsApp = () => {
-    const text = `Hey! Join my Case Study team "${team?.name}".\n\nUse this Team Code to register: *${team?.team_code}*\n\nRegister here: ${window.location.origin}/events`;
+    const text = `Hey! Join my Case Study team "${team?.team_name}".\n\nUse this Team Code to register: *${team?.team_code}*\n\nRegister here: ${window.location.origin}/events`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -132,7 +132,7 @@ export default function CaseStudyDashboard() {
         
         {/* Header */}
         <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '24px', padding: '2rem', marginBottom: '2rem', backdropFilter: 'blur(16px)', textAlign: 'center' }}>
-          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.5rem)', fontWeight: 800, margin: '0 0 0.5rem 0' }}>{team.name}</h1>
+          <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.5rem)', fontWeight: 800, margin: '0 0 0.5rem 0' }}>{team.team_name}</h1>
           <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '1.1rem' }}>Case Study Registration Dashboard</p>
           
           <div style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(0,0,0,0.3)', border: '1px dashed var(--glass-border)', borderRadius: '16px', padding: '1rem 1.5rem', gap: '1.5rem' }}>
@@ -208,7 +208,7 @@ export default function CaseStudyDashboard() {
                     {isFilled ? (
                       <>
                         <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          {member.name} {member.user_id === user?.id && <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px', color: 'var(--text-muted)' }}>You</span>}
+                          {member.full_name} {member.user_id === user?.id && <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px', color: 'var(--text-muted)' }}>You</span>}
                         </div>
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{member.college}</div>
                       </>
