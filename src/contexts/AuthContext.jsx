@@ -51,8 +51,9 @@ export function AuthProvider({ children }) {
   };
 
   const signInWithEmail = async (email) => {
+    const cleanEmail = typeof email === 'string' ? email.trim() : email;
     const { error } = await supabase.auth.signInWithOtp({
-      email,
+      email: cleanEmail,
       options: { emailRedirectTo: window.location.origin },
     });
     if (error) throw error;
