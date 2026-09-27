@@ -32,8 +32,20 @@ export default function Events() {
         if (error) {
           console.error('Supabase error fetching events:', error);
           setErrorMsg(error.message);
+          return;
         }
-        setEvents(data || []);
+
+        const eventsWithCounts = await Promise.all(
+          (data || []).map(async (ev) => {
+            const { count } = await supabase
+              .from('event_registrations')
+              .select('*', { count: 'exact', head: true })
+              .eq('event_id', ev.id);
+            return { ...ev, attendees: count || 0 };
+          })
+        );
+        
+        setEvents(eventsWithCounts);
       } catch (err) {
         console.error('Unexpected error fetching events:', err);
         setErrorMsg(err.message);
