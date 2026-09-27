@@ -218,7 +218,7 @@ export default function EventDetail() {
                   }}>
                     {event.status}
                   </span>
-                ) : (isPast || event.status === 'active') && event.status !== 'ended' ? (
+                ) : ((isPast && event.status !== 'upcoming' && event.status !== 'postponed' && event.status !== 'preponed') || event.status === 'active') && event.status !== 'ended' ? (
                   <span style={{
                     fontSize: 'clamp(0.8rem, 2vw, 1.2rem)',
                     padding: '0.2rem 0.8rem',
@@ -411,13 +411,22 @@ export default function EventDetail() {
                       <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Event Ended</div>
                       <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Thank you for participating!</div>
                     </div>
-                  ) : isPast || event.status === 'active' ? (
+                  ) : (isPast && event.status !== 'upcoming' && event.status !== 'postponed' && event.status !== 'preponed') || event.status === 'active' ? (
                     <div style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: '1.1rem', fontWeight: 700, color: TEAL, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                         <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 10px #4ade80', display: 'inline-block' }} />
                         Event is Active!
                       </div>
                       <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Happening right now — participate now</div>
+                    </div>
+                  ) : event.status === 'postponed' || event.status === 'preponed' || event.status === 'upcoming' && isPast ? (
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', opacity: 0.8, marginBottom: '0.25rem' }}>
+                        {event.status === 'postponed' ? 'Event Postponed' : event.status === 'preponed' ? 'Event Preponed' : 'Stay Tuned'}
+                      </div>
+                      <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                        {event.status === 'postponed' ? 'New date will be announced soon' : event.status === 'preponed' ? 'Check back for updates' : 'More details coming soon'}
+                      </div>
                     </div>
                   ) : (
                     <>

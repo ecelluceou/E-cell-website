@@ -10,8 +10,11 @@ import { SparklesCore } from '../components/UI/Sparkles';
 
 const categorizeEvent = (ev) => {
   if (ev.status === 'ended') return 'ended';
+  if (ev.status === 'active') return 'active';
+  if (ev.status === 'postponed' || ev.status === 'upcoming' || ev.status === 'preponed') return 'upcoming';
+  
   const isPast = ev.date && new Date(ev.date) <= new Date();
-  if (ev.status === 'active' || isPast) return 'active';
+  if (isPast) return 'active';
   return 'upcoming';
 };
 

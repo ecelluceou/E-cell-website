@@ -197,7 +197,7 @@ export function EventCountdownCard({
           >
             Ended
           </motion.div>
-        ) : (timeLeft <= 0 && dateKnown) || status === 'active' ? (
+        ) : (timeLeft <= 0 && dateKnown && status !== 'upcoming' && status !== 'postponed' && status !== 'preponed') || status === 'active' ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -307,13 +307,22 @@ export function EventCountdownCard({
               ))}
             </div>
           </motion.div>
-        ) : (
+        ) : (timeLeft <= 0 && dateKnown && status !== 'upcoming' && status !== 'postponed' && status !== 'preponed') || status === 'active' ? (
           <motion.div variants={shouldAnimate ? childVariants : {}} className="ecc-started">
             <div className="ecc-started-title" style={{ color: 'var(--ecell-teal, #168C83)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 10px #4ade80', display: 'inline-block' }} />
               Event is Active!
             </div>
             <div className="ecc-started-subtitle">Happening right now — join to participate</div>
+          </motion.div>
+        ) : (
+          <motion.div variants={shouldAnimate ? childVariants : {}} className="ecc-started">
+            <div className="ecc-started-title" style={{ color: 'var(--text-primary)', opacity: 0.8 }}>
+              {status === 'postponed' ? 'Event Postponed' : status === 'preponed' ? 'Event Preponed' : 'Stay Tuned'}
+            </div>
+            <div className="ecc-started-subtitle">
+              {status === 'postponed' ? 'New date will be announced soon' : status === 'preponed' ? 'Check back for updates' : 'More details coming soon'}
+            </div>
           </motion.div>
         )}
 

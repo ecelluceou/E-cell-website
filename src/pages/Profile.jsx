@@ -103,7 +103,6 @@ export default function Profile() {
   const joinedDate = profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently';
 
   const getEventBadge = (ev) => {
-    const isPast = ev.date && new Date(ev.date) <= new Date();
     if (ev.status === 'ended' || ev.regStatus === 'attended' || ev.regStatus === 'won') {
       return {
         label: 'Attended',
@@ -113,7 +112,10 @@ export default function Profile() {
         isLive: false
       };
     }
-    if (isPast || ev.status === 'active') {
+    const isPast = ev.date && new Date(ev.date) <= new Date();
+    const isActive = ev.status === 'active' || (!ev.status && isPast) || (isPast && ev.status !== 'upcoming' && ev.status !== 'postponed' && ev.status !== 'preponed');
+
+    if (isActive) {
       return {
         label: 'Active',
         bg: 'rgba(22, 140, 131, 0.18)',
@@ -122,11 +124,16 @@ export default function Profile() {
         isLive: true
       };
     }
+    
+    let label = 'Upcoming';
+    if (ev.status === 'postponed') label = 'Postponed';
+    if (ev.status === 'preponed') label = 'Preponed';
+
     return {
-      label: 'Upcoming',
-      bg: 'rgba(22, 140, 131, 0.1)',
-      color: 'var(--ecell-teal, #168C83)',
-      border: '1px solid rgba(22, 140, 131, 0.2)',
+      label: label,
+      bg: label !== 'Upcoming' ? 'rgba(229,169,0,0.15)' : 'rgba(22, 140, 131, 0.1)',
+      color: label !== 'Upcoming' ? '#E5A900' : 'var(--ecell-teal, #168C83)',
+      border: label !== 'Upcoming' ? '1px solid rgba(229,169,0,0.3)' : '1px solid rgba(22, 140, 131, 0.2)',
       isLive: false
     };
   };
