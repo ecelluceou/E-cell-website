@@ -521,7 +521,7 @@ export default function Home() {
                 fontSize: 'clamp(50px, 15vw, 250px)',
                 fontWeight: 900,
                 fontFamily: '"Space Grotesk", sans-serif',
-                color: 'rgba(255, 255, 255, 0.06)',
+                color: 'rgba(255, 255, 255, 0.18)',
                 margin: 0,
                 paddingRight: '80px', // Space between repeated phrases
                 lineHeight: 0.85,
