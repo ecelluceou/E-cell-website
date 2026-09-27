@@ -184,7 +184,23 @@ export default function ManageEvents() {
               </select>
             </div>
             <input placeholder="Category (e.g. Workshop)" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="admin-input" />
-            <textarea placeholder="Description" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} rows={4} className="admin-input" />
+            <textarea placeholder="About this Event" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} rows={4} className="admin-input" />
+
+            {/* Highlights Array */}
+            <div>
+              <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>What to Expect (Highlights)</label>
+              {formData.highlights.map((h, i) => (
+                <div key={i} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <input placeholder="E.g. Lean startup methodology crash course" value={h} onChange={e => handleArrayChange('highlights', i, e.target.value)} className="admin-input" style={{ flex: 1 }} />
+                  {formData.highlights.length > 1 && (
+                    <button type="button" onClick={() => removeArrayItem('highlights', i)} style={{ background: 'rgba(228,71,46,0.1)', border: 'none', padding: '0.5rem', borderRadius: '8px', color: 'var(--brand-primary)', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                  )}
+                </div>
+              ))}
+              <button type="button" onClick={() => addArrayItem('highlights')} style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Plus size={14} /> Add Highlight
+              </button>
+            </div>
 
             {/* Image Upload */}
             <div>

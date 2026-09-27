@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft, Calendar, Clock, Users, MapPin, Tag,
-  CheckCircle, Share2, BookmarkPlus
+  CheckCircle, Share2, BookmarkPlus, Trophy
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useEventRegistration } from '../hooks/useEventRegistration';
@@ -55,6 +55,7 @@ export default function EventDetail() {
   const { isRegistered, count, loading: regLoading, checking, register, unregister } = useEventRegistration(id);
   const { isSaved, loading: saveLoading, toggleSave } = useEventSave(id);
   const [timeLeft, setTimeLeft] = useState(-1);
+  const [winners, setWinners] = useState([]);
 
   useEffect(() => {
     async function fetchEvent() {
@@ -65,6 +66,21 @@ export default function EventDetail() {
           setTimeLeft(Math.max(0, Math.floor((new Date(data.date).getTime() - Date.now()) / 1000)));
         }
       }
+      
+      // Fetch Winners
+      const { data: winnersData } = await supabase
+        .from('event_registrations')
+        .select(`
+          id,
+          profiles ( id, full_name, avatar_url, college )
+        `)
+        .eq('event_id', id)
+        .eq('status', 'won');
+      
+      if (winnersData) {
+        setWinners(winnersData.map(w => w.profiles).filter(Boolean));
+      }
+      
       setLoading(false);
     }
     fetchEvent();
@@ -306,6 +322,37 @@ export default function EventDetail() {
                         <CheckCircle size={16} color={TEAL} style={{ flexShrink: 0, marginTop: '2px' }} />
                         <span style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{h}</span>
                       </motion.div>
+                    ))}
+                  </div>
+                </motion.section>
+              )}
+
+              {/* Winners (if any) */}
+              {winners.length > 0 && (
+                <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+                  <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(1.15rem, 3vw, 1.4rem)', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Trophy size={18} color={SAFFRON} /> Event Winners
+                  </h2>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+                    {winners.map((winner, idx) => (
+                      <div key={idx} style={{
+                        display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem',
+                        background: 'rgba(229,169,0,0.05)', borderRadius: '12px', border: '1px solid rgba(229,169,0,0.2)'
+                      }}>
+                        <img 
+                          src={winner.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${winner.id}`} 
+                          alt={winner.full_name} 
+                          style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                        />
+                        <div style={{ overflow: 'hidden' }}>
+                          <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {winner.full_name || 'Anonymous'}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {winner.college || 'Unknown College'}
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </motion.section>
