@@ -108,8 +108,8 @@ export default function Profile() {
     dob: profile?.dob || "Not Provided",
     year: "Not Specified",
     joinedDate: joinedDate,
-    eventsAttended: registeredEvents.filter(e => e.date < new Date()).length,
-    upcomingEvents: registeredEvents.filter(e => e.date >= new Date()).length,
+    eventsAttended: registeredEvents.filter(e => new Date(e.date) < new Date()).length,
+    upcomingEvents: registeredEvents.filter(e => new Date(e.date) >= new Date()).length,
     savedEventsCount: savedEvents.length,
     avatarInitials: avatarInitials,
     avatarUrl: avatarUrl,
@@ -341,11 +341,11 @@ export default function Profile() {
                     </div>
                     <span className="event-status-badge" style={{
                       padding: '0.15rem 0.55rem', borderRadius: '9999px', fontSize: '0.68rem', fontWeight: 700,
-                      background: ev.date > new Date() ? 'rgba(22,140,131,0.1)' : 'var(--glass-bg)',
-                      color: ev.date > new Date() ? 'var(--ecell-teal)' : 'var(--text-muted)',
+                      background: new Date(ev.date) > new Date() ? 'rgba(22,140,131,0.1)' : 'var(--glass-bg)',
+                      color: new Date(ev.date) > new Date() ? 'var(--ecell-teal)' : 'var(--text-muted)',
                       flexShrink: 0, whiteSpace: 'nowrap'
                     }}>
-                      {ev.date > new Date() ? 'Upcoming' : 'Attended'}
+                      {new Date(ev.date) > new Date() ? 'Upcoming' : 'Attended'}
                     </span>
                     <ChevronRight size={14} color="#ccc" style={{ flexShrink: 0 }} className="chevron-desktop" />
                   </motion.div>
