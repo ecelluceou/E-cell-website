@@ -82,7 +82,15 @@ export default function Initiatives() {
           Our Initiatives
         </motion.h1>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '2rem' }}>
+        <div style={{ 
+          display: 'flex', 
+          overflowX: 'auto', 
+          gap: '2rem', 
+          paddingBottom: '2rem',
+          scrollSnapType: 'x mandatory',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}>
           {initiatives.map(initiative => (
               <motion.div
                 key={initiative.id}
@@ -92,6 +100,9 @@ export default function Initiatives() {
                 transition={{ duration: 0.3 }}
                 className="glass-panel"
                 style={{
+                  flex: '0 0 auto',
+                  width: 'clamp(300px, 80vw, 400px)',
+                  scrollSnapAlign: 'start',
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
@@ -101,43 +112,28 @@ export default function Initiatives() {
                   backdropFilter: 'blur(16px)'
                 }}
               >
-                {initiative.image ? (
-                  <img src={initiative.image} alt={initiative.title} style={{ width: '100%', height: '220px', objectFit: 'cover' }} />
-                ) : (
-                  <div style={{
-                    width: '100%',
-                    height: '180px',
-                    background: 'linear-gradient(135deg, rgba(228,71,46,0.3) 0%, rgba(22,140,131,0.25) 100%)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: '1.5rem',
-                    textAlign: 'center',
-                    borderBottom: '1px solid var(--glass-border)',
-                    position: 'relative'
-                  }}>
-                    <span style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      padding: '0.35rem 0.8rem',
-                      borderRadius: '100px',
-                      background: 'rgba(228,71,46,0.2)',
-                      color: 'var(--brand-primary)',
-                      border: '1px solid rgba(228,71,46,0.4)',
-                      marginBottom: '0.5rem'
-                    }}>
-                      {initiative.tag || 'Official Initiative'}
-                    </span>
-                    <h3 style={{ fontSize: '1.3rem', margin: 0, color: 'var(--text-primary)', fontWeight: 700 }}>
-                      E-Cell UCEOU
-                    </h3>
-                  </div>
+                {initiative.image && (
+                  <img src={initiative.image} alt={initiative.title} style={{ width: '100%', height: '220px', objectFit: 'cover', borderBottom: '1px solid var(--glass-border)' }} />
                 )}
 
                 <div style={{ padding: '2rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  {initiative.tag && (
+                    <div style={{ marginBottom: '1rem' }}>
+                      <span style={{
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                        padding: '0.35rem 0.8rem',
+                        borderRadius: '100px',
+                        background: 'rgba(228,71,46,0.1)',
+                        color: 'var(--brand-primary)',
+                        border: '1px solid rgba(228,71,46,0.2)'
+                      }}>
+                        {initiative.tag}
+                      </span>
+                    </div>
+                  )}
                   <h3 style={{ fontSize: '1.4rem', marginBottom: '1rem', color: 'var(--brand-primary)', lineHeight: 1.3 }}>
                     {initiative.title}
                   </h3>
