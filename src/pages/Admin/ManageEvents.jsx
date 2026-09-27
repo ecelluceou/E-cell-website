@@ -28,7 +28,10 @@ export default function ManageEvents() {
       highlights: [''],
       tags: [''],
       image: '',
-      status: 'upcoming'
+      status: 'upcoming',
+      registration_status: 'registrations_open',
+      prize: '',
+      team_size: ''
     };
   }
 
@@ -184,6 +187,26 @@ export default function ManageEvents() {
                 <option value="ended">Ended</option>
               </select>
             </div>
+
+            {/* Registration Status + Prize + Team Size */}
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <select 
+                value={formData.registration_status} 
+                onChange={e => setFormData({...formData, registration_status: e.target.value})} 
+                className="admin-input" 
+                style={{ flex: 1, cursor: 'pointer' }}
+              >
+                <option value="registrations_open">🟢 Registrations Open</option>
+                <option value="registrations_closed">🔴 Registrations Closed</option>
+                <option value="coming_soon">⏳ Coming Soon</option>
+                <option value="free_entry">✨ Free Entry</option>
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <input placeholder="Prize / Reward (e.g. ₹5000 Cash)" value={formData.prize || ''} onChange={e => setFormData({...formData, prize: e.target.value})} className="admin-input" style={{ flex: 1 }} />
+              <input placeholder="Team Size (e.g. 2-4)" value={formData.team_size || ''} onChange={e => setFormData({...formData, team_size: e.target.value})} className="admin-input" style={{ flex: 1 }} />
+            </div>
             <input placeholder="Category (e.g. Workshop)" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="admin-input" />
             <textarea placeholder="About this Event" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} rows={4} className="admin-input" />
 
@@ -239,6 +262,26 @@ export default function ManageEvents() {
                   <h4 style={{ margin: '0 0 0.2rem 0', color: 'var(--text-primary)' }}>{event.title}</h4>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{event.date ? new Date(event.date).toLocaleDateString() : 'TBA'}</p>
+                    {/* Registration Status Badge */}
+                    {event.registration_status && (
+                      <span style={{
+                        fontSize: '0.62rem',
+                        padding: '0.1rem 0.45rem',
+                        borderRadius: '4px',
+                        fontWeight: 'bold',
+                        textTransform: 'uppercase',
+                        background: event.registration_status === 'registrations_open' ? 'rgba(22,140,131,0.15)'
+                          : event.registration_status === 'registrations_closed' ? 'rgba(228,71,46,0.12)'
+                          : event.registration_status === 'coming_soon' ? 'rgba(229,169,0,0.12)'
+                          : 'rgba(255,255,255,0.08)',
+                        color: event.registration_status === 'registrations_open' ? '#168C83'
+                          : event.registration_status === 'registrations_closed' ? '#E4472E'
+                          : event.registration_status === 'coming_soon' ? '#E5A900'
+                          : 'var(--text-secondary)'
+                      }}>
+                        {event.registration_status.replace(/_/g, ' ')}
+                      </span>
+                    )}
                     {event.status && event.status !== 'upcoming' && event.status !== 'active' ? (
                       <span style={{
                         fontSize: '0.65rem',

@@ -1,31 +1,67 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, Utensils } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 
 const VERMILION = '#E4472E';
+const CASE_STUDY_EVENT_ID = 'Case-Study';
 
 export default function AnnouncementPopup() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
 
   useEffect(() => {
+    // Only trigger on the home page
+    if (location.pathname !== '/') return;
+
+    // Only show once per session
     const hasSeen = sessionStorage.getItem('hasSeenCaseStudyAnnouncement');
-    if (!hasSeen) {
-      // Small delay to let the initial load finish before popping up
+    if (hasSeen) return;
+
+    async function checkAndShow() {
+      if (user) {
+        // Check regular event_registrations
+        const { data: reg } = await supabase
+          .from('event_registrations')
+          .select('id')
+          .eq('event_id', CASE_STUDY_EVENT_ID)
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        // Check case_study_members (team-based registration)
+        const { data: member } = await supabase
+          .from('case_study_members')
+          .select('id')
+          .eq('email', user.email)
+          .maybeSingle();
+
+        if (reg || member) {
+          // Already registered — mark as seen, don't show
+          sessionStorage.setItem('hasSeenCaseStudyAnnouncement', 'true');
+          return;
+        }
+      }
+
+      // Not registered (or not logged in) → show after short delay
       const timer = setTimeout(() => {
         setIsOpen(true);
         sessionStorage.setItem('hasSeenCaseStudyAnnouncement', 'true');
-      }, 1000);
+      }, 1200);
       return () => clearTimeout(timer);
     }
-  }, []);
+
+    checkAndShow();
+  }, [location.pathname, user]);
 
   const handleClose = () => setIsOpen(false);
 
   const handleCheckOut = () => {
     setIsOpen(false);
-    navigate('/events');
+    navigate(`/events/${CASE_STUDY_EVENT_ID}`);
   };
 
   return (

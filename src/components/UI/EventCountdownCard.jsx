@@ -14,6 +14,7 @@ export function EventCountdownCard({
   className = "",
   status = "upcoming",
   isRegistered = false,
+  registrationStatus,
 }) {
   // When no date is set, freeze everything at 0
   const dateKnown = date !== null && date !== undefined;
@@ -264,13 +265,39 @@ export function EventCountdownCard({
           <div className="ecc-meta">
             <div className="ecc-meta-item">
               <Calendar size={16} />
-              <span>{dateKnown ? parsedDate.toLocaleDateString() : '--/--/26'}</span>
+              <span>{dateKnown ? parsedDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Date TBA'}</span>
             </div>
             <div className="ecc-meta-item">
               <Users size={16} />
               <span>{attendees} registered</span>
             </div>
           </div>
+
+          {/* Registration Status Badge */}
+          {registrationStatus && status !== 'ended' && (
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.3rem',
+              marginTop: '0.4rem',
+              padding: '0.2rem 0.6rem',
+              borderRadius: '9999px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              background: registrationStatus === 'registrations_open' ? 'rgba(22,140,131,0.15)'
+                : registrationStatus === 'registrations_closed' ? 'rgba(228,71,46,0.12)'
+                : registrationStatus === 'coming_soon' ? 'rgba(229,169,0,0.12)'
+                : 'rgba(255,255,255,0.08)',
+              color: registrationStatus === 'registrations_open' ? '#168C83'
+                : registrationStatus === 'registrations_closed' ? '#E4472E'
+                : registrationStatus === 'coming_soon' ? '#E5A900'
+                : 'var(--text-secondary)',
+              border: `1px solid ${registrationStatus === 'registrations_open' ? 'rgba(22,140,131,0.25)' : registrationStatus === 'registrations_closed' ? 'rgba(228,71,46,0.2)' : 'transparent'}`,
+            }}>
+              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'currentColor', flexShrink: 0 }} />
+              {registrationStatus.replace(/_/g, ' ')}
+            </div>
+          )}
         </motion.div>
 
         {/* Countdown Display */}
