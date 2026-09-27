@@ -17,7 +17,7 @@ export class ErrorBoundary extends React.Component {
   }
 
   handleRetry = () => {
-    this.setState({ hasError: false, error: null, errorInfo: null });
+    window.location.reload();
   };
 
   render() {
