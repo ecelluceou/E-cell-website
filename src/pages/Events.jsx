@@ -113,7 +113,7 @@ export default function Events() {
               fontFamily: 'var(--font-heading)'
             }}
           >
-            All Events
+            What's Cookin' at E-Cell
           </motion.h1>
           
           <motion.div 
