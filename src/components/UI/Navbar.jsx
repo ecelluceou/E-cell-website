@@ -342,7 +342,15 @@ export default function Navbar() {
                 transition: 'all 0.2s ease'
               }}
             >
-              <UserCircle size={18} />
+              {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
+                <img 
+                  src={profile?.avatar_url || user?.user_metadata?.avatar_url} 
+                  alt="Profile" 
+                  style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} 
+                />
+              ) : (
+                <UserCircle size={24} />
+              )}
               <span className="profile-label">Profile</span>
             </Link>
           )}
@@ -523,7 +531,16 @@ export default function Navbar() {
                     background: location.pathname === '/profile' ? 'rgba(228,71,46,0.08)' : 'transparent',
                   }}
                 >
-                  <UserCircle size={18} /> Profile
+                  {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
+                    <img 
+                      src={profile?.avatar_url || user?.user_metadata?.avatar_url} 
+                      alt="Profile" 
+                      style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} 
+                    />
+                  ) : (
+                    <UserCircle size={24} />
+                  )}
+                  Profile
                 </Link>
               )}
 
