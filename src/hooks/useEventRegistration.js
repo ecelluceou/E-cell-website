@@ -40,24 +40,26 @@ export function useEventRegistration(eventId) {
   const register = async () => {
     if (!user) return;
     setLoading(true);
-    await supabase.from('event_registrations').insert({
+    const { error } = await supabase.from('event_registrations').insert({
       user_id: user.id,
       event_id: eventId,
     });
-    await checkStatus();
+    if (!error) await checkStatus(); // Only refresh count on success
     setLoading(false);
+    return { error };
   };
 
   const unregister = async () => {
     if (!user) return;
     setLoading(true);
-    await supabase.from('event_registrations')
+    const { error } = await supabase.from('event_registrations')
       .delete()
       .eq('event_id', eventId)
       .eq('user_id', user.id);
-    await checkStatus();
+    if (!error) await checkStatus(); // Only refresh count on success
     setLoading(false);
+    return { error };
   };
 
-  return { isRegistered, count, loading, checking, register, unregister };
+  return { isRegistered, count, loading, checking, register, unregister, checkStatus };
 }

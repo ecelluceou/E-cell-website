@@ -180,7 +180,6 @@ export default function CaseStudyDashboard() {
             {slots.map(index => {
               const member = members[index];
               const isFilled = !!member;
-              const isLeadSlot = index === 0;
 
               return (
                 <motion.div 

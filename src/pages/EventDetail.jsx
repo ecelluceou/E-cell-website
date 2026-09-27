@@ -53,7 +53,7 @@ export default function EventDetail() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { isRegistered, count, loading: regLoading, checking, register, unregister } = useEventRegistration(id);
+  const { isRegistered, count, loading: regLoading, checking, register, unregister, checkStatus } = useEventRegistration(id);
   const { isSaved, loading: saveLoading, toggleSave } = useEventSave(id);
   const [timeLeft, setTimeLeft] = useState(-1);
   const [winners, setWinners] = useState([]);
@@ -110,6 +110,22 @@ export default function EventDetail() {
       setLoading(false);
     }
     fetchEvent();
+
+    // Real-time: refresh registration count when anyone registers/unregisters
+    const channel = supabase
+      .channel(`event_regs_${id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'event_registrations',
+        filter: `event_id=eq.${id}`,
+      }, () => {
+        // Refresh count when another user registers/unregisters
+        checkStatus();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, [id]);
 
   useEffect(() => {

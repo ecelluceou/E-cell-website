@@ -147,10 +147,10 @@ export default function Profile() {
     dob: profile?.dob || "Not Provided",
     year: "Not Specified",
     joinedDate: joinedDate,
-    eventsAttended: registeredEvents.filter(e => e.regStatus === 'attended' || e.regStatus === 'won' || e.status === 'ended').length,
+    eventsAttended: registeredEvents.filter(e => e.regStatus === 'attended' || e.regStatus === 'won').length,
     upcomingEvents: registeredEvents.filter(e => {
       const label = getEventBadge(e).label;
-      return label === 'Upcoming' || label === 'Postponed' || label === 'Preponed';
+      return label === 'Active' || label === 'Upcoming' || label === 'Postponed' || label === 'Preponed';
     }).length,
     savedEventsCount: savedEvents.length,
     avatarInitials: avatarInitials,
@@ -307,7 +307,7 @@ export default function Profile() {
           <StatCard icon={<Award size={20} />} value={profileData.eventsAttended} label="Events Attended" color="var(--brand-primary)" />
           <StatCard icon={<CalendarCheck size={20} />} value={profileData.upcomingEvents} label="Upcoming Events" color="var(--ecell-teal)" />
           <StatCard icon={<Star size={20} />} value={profileData.savedEventsCount} label="Events Saved" color="var(--ecell-saffron)" />
-          <StatCard icon={<TrendingUp size={20} />} value="New" label="Engagement" color="var(--ecell-cobalt)" />
+          <StatCard icon={<TrendingUp size={20} />} value={registeredEvents.length} label="Total Registered" color="var(--ecell-cobalt)" />
         </motion.div>
 
         {/* Tabs */}
