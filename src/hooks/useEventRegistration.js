@@ -12,33 +12,22 @@ export function useEventRegistration(eventId) {
   const checkStatus = useCallback(async () => {
     setChecking(true);
 
-    // Get total attendee count from regular registrations
-    const { count: total } = await supabase
-      .from('event_registrations')
-      .select('*', { count: 'exact', head: true })
-      .eq('event_id', eventId);
-      
-    let finalCount = total ?? 0;
+    // Use the SECURITY DEFINER RPC — works for ALL users (anon + logged in)
+    // Falls back to direct query if RPC doesn't exist yet (pre-migration)
+    const { data: rpcCount, error: rpcError } = await supabase
+      .rpc('get_event_participant_count', { p_event_id: eventId });
 
-    // Add case study team members count (combined leads + members) if any exist
-    const { data: allTeamsData } = await supabase
-      .from('case_study_teams')
-      .select('id, event_id');
-      
-    // Include teams that explicitly belong to this event OR have no event_id (legacy data)
-    const relevantTeamIds = (allTeamsData || [])
-      .filter(t => t.event_id === eventId || t.event_id === null || t.event_id === undefined)
-      .map(t => t.id);
-      
-    if (relevantTeamIds.length > 0) {
-      const { count: memberCount } = await supabase
-        .from('case_study_members')
+    if (!rpcError && rpcCount !== null) {
+      setCount(rpcCount);
+    } else {
+      // Fallback: direct query (only counts what RLS allows)
+      const { count: total } = await supabase
+        .from('event_registrations')
         .select('*', { count: 'exact', head: true })
-        .in('team_id', relevantTeamIds);
-      finalCount += (memberCount ?? 0);
+        .eq('event_id', eventId);
+      setCount(total ?? 0);
     }
 
-    setCount(finalCount);
 
     // Check if this user is registered
     if (user) {

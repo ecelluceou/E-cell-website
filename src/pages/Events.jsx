@@ -40,28 +40,20 @@ export default function Events() {
 
         const eventsWithCounts = await Promise.all(
           (data || []).map(async (ev) => {
-            const { count } = await supabase
-              .from('event_registrations')
-              .select('*', { count: 'exact', head: true })
-              .eq('event_id', ev.id);
-            let finalCount = count || 0;
-            if (ev.title?.toLowerCase().includes('case study')) {
-              const { data: allTeams } = await supabase
-                .from('case_study_teams')
-                .select('id, event_id');
-                
-              // Include teams that belong to this event OR have no event_id (legacy data)
-              const relevantIds = (allTeams || [])
-                .filter(t => t.event_id === ev.id || t.event_id === null || t.event_id === undefined)
-                .map(t => t.id);
-                
-              if (relevantIds.length > 0) {
-                const { count: memberCount } = await supabase
-                  .from('case_study_members')
-                  .select('*', { count: 'exact', head: true })
-                  .in('team_id', relevantIds);
-                finalCount += (memberCount || 0);
-              }
+            // Use SECURITY DEFINER RPC for count — works for ALL users
+            const { data: rpcCount, error: rpcError } = await supabase
+              .rpc('get_event_participant_count', { p_event_id: ev.id });
+
+            let finalCount = 0;
+            if (!rpcError && rpcCount !== null) {
+              finalCount = rpcCount;
+            } else {
+              // Fallback if RPC not yet deployed
+              const { count } = await supabase
+                .from('event_registrations')
+                .select('*', { count: 'exact', head: true })
+                .eq('event_id', ev.id);
+              finalCount = count || 0;
             }
             return { ...ev, attendees: finalCount };
           })
