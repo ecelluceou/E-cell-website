@@ -10,6 +10,7 @@ import { useEventRegistration } from '../hooks/useEventRegistration';
 import { useEventSave } from '../hooks/useEventSave';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import CaseStudyRegistrationModal from '../components/UI/CaseStudyRegistrationModal';
 
 // ─── Palette ────────────────────────────────────────────────────────────────
 const VERMILION = '#E4472E';
@@ -56,6 +57,8 @@ export default function EventDetail() {
   const { isSaved, loading: saveLoading, toggleSave } = useEventSave(id);
   const [timeLeft, setTimeLeft] = useState(-1);
   const [winners, setWinners] = useState([]);
+  const [isCaseStudyModalOpen, setIsCaseStudyModalOpen] = useState(false);
+  const isCaseStudy = event?.title?.toLowerCase().includes('case study');
 
   useEffect(() => {
     async function fetchEvent() {
@@ -480,6 +483,10 @@ export default function EventDetail() {
                 <motion.button
                   onClick={async () => {
                     if (!user) { navigate('/auth'); return; }
+                    if (isCaseStudy) {
+                      setIsCaseStudyModalOpen(true);
+                      return;
+                    }
                     if (isRegistered) { await unregister(); } else { await register(); }
                   }}
                   disabled={regLoading || checking}
@@ -510,7 +517,7 @@ export default function EventDetail() {
                         ? '🔒 Sign in to Register'
                         : isRegistered
                           ? '✓ Registered — Click to Cancel'
-                          : 'Reserve Your Spot →'}
+                          : isCaseStudy ? 'Register for Case Study →' : 'Reserve Your Spot →'}
                 </motion.button>
               ) : (
                 <div style={{
@@ -545,6 +552,11 @@ export default function EventDetail() {
           </div>
         </motion.div>
       </div>
+
+      <CaseStudyRegistrationModal 
+        isOpen={isCaseStudyModalOpen} 
+        onClose={() => setIsCaseStudyModalOpen(false)} 
+      />
     </div>
   );
 }

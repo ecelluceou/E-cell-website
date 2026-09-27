@@ -13,6 +13,7 @@ const Initiatives = React.lazy(() => import('./pages/Initiatives'));
 const Team = React.lazy(() => import('./pages/Team'));
 const Events = React.lazy(() => import('./pages/Events'));
 const EventDetail = React.lazy(() => import('./pages/EventDetail'));
+const CaseStudyDashboard = React.lazy(() => import('./pages/CaseStudyDashboard'));
 const Announcements = React.lazy(() => import('./pages/Announcements'));
 const Auth = React.lazy(() => import('./pages/Auth'));
 const Profile = React.lazy(() => import('./pages/Profile'));
@@ -44,6 +45,7 @@ function Layout() {
             <Route path="/team" element={<Team />} />
             <Route path="/events" element={<Events />} />
             <Route path="/events/:id" element={<EventDetail />} />
+            <Route path="/events/case-study/dashboard/:teamId" element={<ProtectedRoute><CaseStudyDashboard /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/auth" element={<Auth />} />
