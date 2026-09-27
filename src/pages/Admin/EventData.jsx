@@ -29,31 +29,75 @@ export default function EventData() {
     
     async function fetchRegistrations() {
       setLoading(true);
-      // We join with profiles to get the user data
-      const { data, error } = await supabase
-        .from('event_registrations')
-        .select(`
-          id,
-          status,
-          registered_at,
-          profiles ( id, full_name, email, college, phone )
-        `)
-        .eq('event_id', selectedEventId)
-        .order('registered_at', { ascending: false });
+      
+      const selectedEvent = events.find(ev => ev.id === selectedEventId);
+      const isCaseStudy = selectedEvent?.title?.toLowerCase().includes('case study');
 
-      if (error) {
-        console.error("Error fetching registrations:", error);
+      if (isCaseStudy) {
+        // Fetch from case study tables
+        const { data: teamData, error } = await supabase
+          .from('case_study_teams')
+          .select(`
+            team_name,
+            case_study_members ( id, full_name, email, college, phone, created_at, status )
+          `)
+          .eq('event_id', selectedEventId);
+          
+        if (error) {
+          console.error("Error fetching case study registrations:", error);
+        } else {
+          const caseStudyRegs = [];
+          (teamData || []).forEach(team => {
+            if (team.case_study_members) {
+              team.case_study_members.forEach(member => {
+                caseStudyRegs.push({
+                  id: member.id,
+                  status: member.status || 'registered',
+                  registered_at: member.created_at,
+                  isCaseStudyMember: true,
+                  team_name: team.team_name,
+                  profiles: {
+                    full_name: member.full_name,
+                    email: member.email,
+                    college: member.college,
+                    phone: member.phone
+                  }
+                });
+              });
+            }
+          });
+          // Sort by date descending
+          caseStudyRegs.sort((a, b) => new Date(b.registered_at) - new Date(a.registered_at));
+          setRegistrations(caseStudyRegs);
+        }
       } else {
-        setRegistrations(data || []);
+        // Fetch from regular event_registrations
+        const { data, error } = await supabase
+          .from('event_registrations')
+          .select(`
+            id,
+            status,
+            registered_at,
+            profiles ( id, full_name, email, college, phone )
+          `)
+          .eq('event_id', selectedEventId)
+          .order('registered_at', { ascending: false });
+
+        if (error) {
+          console.error("Error fetching registrations:", error);
+        } else {
+          setRegistrations(data || []);
+        }
       }
       setLoading(false);
     }
     fetchRegistrations();
-  }, [selectedEventId]);
+  }, [selectedEventId, events]);
 
   const exportCSV = () => {
     if (registrations.length === 0) return;
-    const headers = ['Name', 'Email', 'College', 'Phone', 'Registered At', 'Status'];
+    const isCaseStudy = registrations[0]?.isCaseStudyMember;
+    const headers = ['Name', 'Email', 'College', 'Phone', isCaseStudy ? 'Team Name' : '', 'Registered At', 'Status'].filter(Boolean);
     const rows = registrations.map(r => {
       const p = r.profiles || {};
       return [
@@ -61,6 +105,7 @@ export default function EventData() {
         p.email || '',
         p.college || '',
         p.phone || '',
+        r.team_name || '',
         new Date(r.registered_at).toLocaleString(),
         r.status || 'registered'
       ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(','); // Escape quotes
@@ -76,9 +121,18 @@ export default function EventData() {
     document.body.removeChild(link);
   };
 
-  const updateStatus = async (registrationId, newStatus) => {
+  const updateStatus = async (registrationId, newStatus, isCaseStudyMember) => {
     setRegistrations(regs => regs.map(r => r.id === registrationId ? { ...r, status: newStatus } : r));
-    await supabase.from('event_registrations').update({ status: newStatus }).eq('id', registrationId);
+    
+    if (isCaseStudyMember) {
+      const { error } = await supabase.from('case_study_members').update({ status: newStatus }).eq('id', registrationId);
+      if (error) {
+        console.error("Error updating status (Make sure 'status' column exists on case_study_members):", error);
+        alert("Failed to update status. Please make sure the 'status' column exists in the 'case_study_members' table.");
+      }
+    } else {
+      await supabase.from('event_registrations').update({ status: newStatus }).eq('id', registrationId);
+    }
   };
 
   if (loading && events.length === 0) return <Loader />;
@@ -138,6 +192,7 @@ export default function EventData() {
                   <td style={{ padding: '1rem' }}>
                     <div style={{ fontWeight: 600 }}>{reg.profiles?.full_name || 'Unknown'}</div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{reg.profiles?.email}</div>
+                    {reg.team_name && <div style={{ fontSize: '0.75rem', marginTop: '0.2rem', color: 'var(--brand-primary)' }}>Team: {reg.team_name}</div>}
                   </td>
                   <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{reg.profiles?.college || '-'}</td>
                   <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{new Date(reg.registered_at).toLocaleDateString()}</td>
@@ -153,12 +208,17 @@ export default function EventData() {
                   <td style={{ padding: '1rem', textAlign: 'right' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
                       <button 
-                        onClick={() => updateStatus(reg.id, 'attended')}
+                        onClick={() => updateStatus(reg.id, 'registered', reg.isCaseStudyMember)}
+                        title="Reset to Registered"
+                        style={{ background: 'rgba(255,255,255,0.05)', border: 'none', padding: '0.4rem', borderRadius: '6px', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                      ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+                      <button 
+                        onClick={() => updateStatus(reg.id, 'attended', reg.isCaseStudyMember)}
                         title="Mark as Attended"
                         style={{ background: 'rgba(22,140,131,0.1)', border: 'none', padding: '0.4rem', borderRadius: '6px', color: '#168C83', cursor: 'pointer' }}
                       ><CheckCircle size={16} /></button>
                       <button 
-                        onClick={() => updateStatus(reg.id, 'won')}
+                        onClick={() => updateStatus(reg.id, 'won', reg.isCaseStudyMember)}
                         title="Mark as Winner"
                         style={{ background: 'rgba(229,169,0,0.1)', border: 'none', padding: '0.4rem', borderRadius: '6px', color: '#E5A900', cursor: 'pointer' }}
                       ><Trophy size={16} /></button>
