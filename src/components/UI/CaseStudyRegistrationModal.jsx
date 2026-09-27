@@ -28,7 +28,7 @@ export default function CaseStudyRegistrationModal({ isOpen, onClose }) {
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
-    const res = await createTeam(formData.teamName, formData);
+    const res = await createTeam(formData.teamName, { ...formData, email: user?.email || formData.email });
     if (res.success) {
       onClose();
       navigate(`/events/case-study/dashboard/${res.teamId}`);
@@ -37,7 +37,7 @@ export default function CaseStudyRegistrationModal({ isOpen, onClose }) {
 
   const handleJoinSubmit = async (e) => {
     e.preventDefault();
-    const res = await joinTeam(formData.teamCode, formData);
+    const res = await joinTeam(formData.teamCode, { ...formData, email: user?.email || formData.email });
     if (res.success) {
       onClose();
       navigate(`/events/case-study/dashboard/${res.teamId}`);
@@ -115,7 +115,7 @@ export default function CaseStudyRegistrationModal({ isOpen, onClose }) {
                   </div>
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.2rem' }}>Join Existing Team</div>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Use a 6-character code provided by your leader.</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Use the code provided by your leader (e.g. CS-9X2K).</div>
                   </div>
                 </button>
               </div>

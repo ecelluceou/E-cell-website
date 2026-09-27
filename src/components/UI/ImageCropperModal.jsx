@@ -97,18 +97,16 @@ const createImage = (url) =>
 
 async function getCroppedImg(imageSrc, pixelCrop) {
   const image = await createImage(imageSrc);
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-
-  if (!ctx) {
-    return null;
+  // Limit max dimensions to prevent excessive allocation
+  const MAX_DIM = 2000;
+  let width = pixelCrop.width;
+  let height = pixelCrop.height;
+  
+  if (width > MAX_DIM || height > MAX_DIM) {
+    const scale = Math.min(MAX_DIM / width, MAX_DIM / height);
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
   }
-
-  // set canvas size to match the bounding box
-  canvas.width = image.width;
-  canvas.height = image.height;
-
-  ctx.drawImage(image, 0, 0);
 
   const croppedCanvas = document.createElement('canvas');
   const croppedCtx = croppedCanvas.getContext('2d');
@@ -118,20 +116,20 @@ async function getCroppedImg(imageSrc, pixelCrop) {
   }
 
   // Set the size of the cropped canvas
-  croppedCanvas.width = pixelCrop.width;
-  croppedCanvas.height = pixelCrop.height;
+  croppedCanvas.width = width;
+  croppedCanvas.height = height;
 
-  // Draw the cropped image onto the new canvas
+  // Draw the cropped image onto the canvas directly from the image
   croppedCtx.drawImage(
-    canvas,
+    image,
     pixelCrop.x,
     pixelCrop.y,
     pixelCrop.width,
     pixelCrop.height,
     0,
     0,
-    pixelCrop.width,
-    pixelCrop.height
+    width,
+    height
   );
 
   // As a blob

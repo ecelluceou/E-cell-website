@@ -148,7 +148,10 @@ export default function Profile() {
     year: "Not Specified",
     joinedDate: joinedDate,
     eventsAttended: registeredEvents.filter(e => e.regStatus === 'attended' || e.regStatus === 'won' || e.status === 'ended').length,
-    upcomingEvents: registeredEvents.filter(e => (!e.status || e.status !== 'ended') && e.regStatus !== 'attended' && e.regStatus !== 'won').length,
+    upcomingEvents: registeredEvents.filter(e => {
+      const label = getEventBadge(e).label;
+      return label === 'Upcoming' || label === 'Postponed' || label === 'Preponed';
+    }).length,
     savedEventsCount: savedEvents.length,
     avatarInitials: avatarInitials,
     avatarUrl: avatarUrl,

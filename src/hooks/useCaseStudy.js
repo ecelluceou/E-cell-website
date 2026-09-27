@@ -72,39 +72,23 @@ export function useCaseStudy() {
     setLoading(true);
     setError(null);
     try {
-      const { data: team, error: teamError } = await supabase
-        .from('case_study_teams')
-        .select('id, max_members, is_locked')
-        .eq('team_code', teamCode.toUpperCase())
-        .single();
+      const { data: teamId, error: rpcError } = await supabase.rpc('join_case_study_team', {
+        p_team_code: teamCode.toUpperCase(),
+        p_name: memberDetails.name,
+        p_email: memberDetails.email,
+        p_phone: memberDetails.phone,
+        p_college: memberDetails.college,
+        p_roll_number: memberDetails.rollNumber
+      });
 
-      if (teamError || !team) throw new Error('Invalid team code. Please check and try again.');
-      if (team.is_locked) throw new Error('This team is locked and no longer accepting members.');
+      if (rpcError) {
+        if (rpcError.message.includes('unique_team_email') || rpcError.code === '23505') {
+          throw new Error('This email is already registered in this team.');
+        }
+        throw new Error(rpcError.message || 'Failed to join team.');
+      }
 
-      const { count, error: countError } = await supabase
-        .from('case_study_members')
-        .select('*', { count: 'exact', head: true })
-        .eq('team_id', team.id);
-
-      if (countError) throw countError;
-
-      const maxSlots = team.max_members || 5;
-      if (count >= maxSlots) throw new Error('This team is already full (max 5 members).');
-
-      const { error: memberError } = await supabase
-        .from('case_study_members')
-        .insert({
-          team_id: team.id,
-          full_name: memberDetails.name,
-          email: memberDetails.email,
-          phone: memberDetails.phone,
-          college: memberDetails.college,
-          roll_number: memberDetails.rollNumber,
-          is_lead: false
-        });
-
-      if (memberError) throw memberError;
-      return { success: true, teamId: team.id };
+      return { success: true, teamId };
     } catch (err) {
       console.error('joinTeam error:', err);
       setError(err.message);

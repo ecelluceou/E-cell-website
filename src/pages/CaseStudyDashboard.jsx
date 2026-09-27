@@ -125,7 +125,8 @@ export default function CaseStudyDashboard() {
   if (loading) return <Loader />;
   if (!team) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Team not found</div>;
 
-  const slots = [0, 1, 2, 3, 4];
+  const maxMembers = team.max_members || 5;
+  const slots = Array.from({ length: maxMembers }, (_, i) => i);
 
   return (
     <div style={{ minHeight: '100vh', paddingTop: '100px', paddingBottom: '4rem', paddingInline: '1rem', color: 'white' }}>
@@ -161,7 +162,7 @@ export default function CaseStudyDashboard() {
 
         {/* Roster */}
         <h2 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.5rem)', fontWeight: 700, marginBottom: '1.5rem', paddingLeft: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-          Team Roster ({members.length}/5)
+          Team Roster ({members.length}/{maxMembers})
           
           {isCurrentUserLead && (
             <button 
@@ -243,9 +244,9 @@ export default function CaseStudyDashboard() {
           </AnimatePresence>
         </div>
         
-        {members.length < 5 && (
+        {members.length < maxMembers && (
           <div style={{ textAlign: 'center', marginTop: '2rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-            Note: Empty slots are fine. If you don't fill all 5 slots, your team will compete with the current members.
+            Note: Empty slots are fine. If you don't fill all {maxMembers} slots, your team will compete with the current members.
           </div>
         )}
       </div>

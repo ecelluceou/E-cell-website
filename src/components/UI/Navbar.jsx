@@ -345,7 +345,7 @@ export default function Navbar() {
               {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
                 <img 
                   src={profile?.avatar_url || user?.user_metadata?.avatar_url} 
-                  alt="Profile" 
+                  alt="" 
                   style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} 
                 />
               ) : (
@@ -534,7 +534,7 @@ export default function Navbar() {
                   {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
                     <img 
                       src={profile?.avatar_url || user?.user_metadata?.avatar_url} 
-                      alt="Profile" 
+                      alt="" 
                       style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)' }} 
                     />
                   ) : (

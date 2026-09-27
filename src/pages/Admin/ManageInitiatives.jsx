@@ -73,7 +73,7 @@ export default function ManageInitiatives() {
     setCropImageSrc(null); // Close modal
     if (!croppedBlob) return;
     
-    const fileName = `${Math.random()}.${cropFileExt || 'jpg'}`;
+    const fileName = `${Math.random()}.jpg`;
     const filePath = `initiatives/${fileName}`;
     const file = new File([croppedBlob], fileName, { type: croppedBlob.type });
 

@@ -56,7 +56,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
     setCropImageSrc(null);
     if (!croppedBlob) return;
     
-    const fileName = `${Math.random()}.${cropFileExt || 'jpg'}`;
+    const fileName = `${Math.random()}.jpg`;
     const file = new File([croppedBlob], fileName, { type: croppedBlob.type });
     
     if (cropType === 'avatar') {
