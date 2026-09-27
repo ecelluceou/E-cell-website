@@ -179,7 +179,7 @@ export default function Navbar() {
           >
             {/* Transparent Logo Image */}
             <img 
-              src="/logo.png" 
+              src="/logo-transparent.png" 
               alt="E-Cell UCEOU Logo" 
               style={{ 
                 width: '100%',
