@@ -53,6 +53,10 @@ export default function Initiatives() {
     fetchInitiatives();
   }, []);
 
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
     <div style={{ position: 'relative', minHeight: '100vh', color: 'var(--text-primary)', overflow: 'hidden' }}>
       <RadialBackground />
@@ -69,20 +73,17 @@ export default function Initiatives() {
         />
       </div>
       <div style={{ position: 'relative', zIndex: 1, padding: 'clamp(5.5rem, 12vw, 8rem) clamp(1rem, 5vw, 5vw) 4rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           style={{ fontSize: 'clamp(1.75rem, 5vw, 3rem)', color: 'var(--ecell-vermilion)', borderBottom: '1px solid rgba(228,71,46,0.2)', paddingBottom: '0.75rem', marginBottom: 'clamp(1.5rem, 4vw, 3rem)' }}
         >
           Our Initiatives
         </motion.h1>
-        
-        {loading && initiatives.length === 0 ? (
-          <div style={{ padding: '4rem', textAlign: 'center' }}>Loading initiatives...</div>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '2rem' }}>
-            {initiatives.map(initiative => (
-              <motion.div 
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))', gap: '2rem' }}>
+          {initiatives.map(initiative => (
+              <motion.div
                 key={initiative.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -150,12 +151,12 @@ export default function Initiatives() {
                     {initiative.description}
                   </p>
                   {initiative.link && (
-                    <motion.a 
+                    <motion.a
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      href={initiative.link} 
-                      target="_blank" 
-                      rel="noreferrer" 
+                      href={initiative.link}
+                      target="_blank"
+                      rel="noreferrer"
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -177,8 +178,7 @@ export default function Initiatives() {
                 </div>
               </motion.div>
             ))}
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

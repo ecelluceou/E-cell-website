@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { EventCountdownCard } from '../components/UI/EventCountdownCard';
 import { supabase } from '../lib/supabase';
+import { Loader } from '../components/UI/Loader';
 
 import { RadialBackground } from '../components/UI/RadialBackground';
 import { SparklesCore } from '../components/UI/Sparkles';
@@ -31,6 +32,10 @@ export default function Events() {
     }
     fetchEvents();
   }, []);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', color: 'var(--text-primary)', overflow: 'hidden' }}>
@@ -69,9 +74,7 @@ export default function Events() {
         Upcoming Events
       </motion.h1>
       
-      {loading ? (
-        <div style={{ padding: '4rem', textAlign: 'center' }}>Loading events...</div>
-      ) : errorMsg ? (
+      {errorMsg ? (
         <div style={{ padding: '4rem', textAlign: 'center', color: '#E4472E' }}>
           Error loading events: {errorMsg}. Please ensure Supabase Row Level Security (RLS) allows anonymous reads for the 'events' table.
         </div>
