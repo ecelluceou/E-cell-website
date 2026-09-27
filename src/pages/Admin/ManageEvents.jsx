@@ -3,10 +3,13 @@ import { supabase } from '../../lib/supabase';
 import { Loader } from '../../components/UI/Loader';
 import { Plus, Trash2, Edit3, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
+import ImageCropperModal from '../../components/UI/ImageCropperModal';
 
 export default function ManageEvents() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cropImageSrc, setCropImageSrc] = useState(null);
+  const [cropFileExt, setCropFileExt] = useState(null);
 
   // Form State
   const [isEditing, setIsEditing] = useState(false);
@@ -55,13 +58,26 @@ export default function ManageEvents() {
     setFormData({ ...formData, [field]: newArray });
   };
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
+    setCropFileExt(fileExt);
+
+    const reader = new FileReader();
+    reader.onload = () => setCropImageSrc(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleCropDone = async (croppedBlob) => {
+    setCropImageSrc(null); // Close modal
+    if (!croppedBlob) return;
+    
+    const fileName = `${Math.random()}.${cropFileExt || 'jpg'}`;
     const filePath = `events/${fileName}`;
+    const file = new File([croppedBlob], fileName, { type: croppedBlob.type });
 
     try {
       const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file);
@@ -118,6 +134,14 @@ export default function ManageEvents() {
 
   return (
     <div>
+      {cropImageSrc && (
+        <ImageCropperModal 
+          imageSrc={cropImageSrc}
+          aspect={16 / 9} // Event banner aspect ratio
+          onCropDone={handleCropDone}
+          onCancel={() => setCropImageSrc(null)}
+        />
+      )}
       <h1 style={{ fontFamily: 'var(--font-heading)', marginBottom: '2rem' }}>Manage Events</h1>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '2rem' }}>

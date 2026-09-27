@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Upload, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import ImageCropperModal from './ImageCropperModal';
 
 export default function EditProfileModal({ isOpen, onClose }) {
   const { user, profile, fetchProfile } = useAuth();
@@ -29,9 +30,40 @@ export default function EditProfileModal({ isOpen, onClose }) {
   const [bannerFile, setBannerFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  const [cropImageSrc, setCropImageSrc] = useState(null);
+  const [cropType, setCropType] = useState(null);
+  const [cropFileExt, setCropFileExt] = useState(null);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleImageSelect = (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setCropFileExt(file.name.split('.').pop());
+    setCropType(type);
+
+    const reader = new FileReader();
+    reader.onload = () => setCropImageSrc(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const handleCropDone = (croppedBlob) => {
+    setCropImageSrc(null);
+    if (!croppedBlob) return;
+    
+    const fileName = `${Math.random()}.${cropFileExt || 'jpg'}`;
+    const file = new File([croppedBlob], fileName, { type: croppedBlob.type });
+    
+    if (cropType === 'avatar') {
+      setAvatarFile(file);
+    } else if (cropType === 'banner') {
+      setBannerFile(file);
+    }
   };
 
   const uploadFile = async (file, pathPrefix) => {
@@ -90,6 +122,14 @@ export default function EditProfileModal({ isOpen, onClose }) {
 
   return (
     <AnimatePresence>
+      {cropImageSrc && (
+        <ImageCropperModal 
+          imageSrc={cropImageSrc}
+          aspect={cropType === 'avatar' ? 1 : 16 / 9}
+          onCropDone={handleCropDone}
+          onCancel={() => setCropImageSrc(null)}
+        />
+      )}
       <div style={{
         position: 'fixed', inset: 0, zIndex: 100,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -136,7 +176,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Avatar Image</label>
                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                  <input type="file" accept="image/*" onChange={(e) => setAvatarFile(e.target.files[0])} style={{ position: 'absolute', opacity: 0, inset: 0, cursor: 'pointer' }} />
+                  <input type="file" accept="image/*" onChange={(e) => handleImageSelect(e, 'avatar')} style={{ position: 'absolute', opacity: 0, inset: 0, cursor: 'pointer' }} />
                   <div style={{ padding: '0.75rem', background: 'var(--glass-bg)', border: '1px dashed var(--glass-border)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
                     <Upload size={14} /> {avatarFile ? avatarFile.name : 'Choose File'}
                   </div>
@@ -146,7 +186,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Banner Image</label>
                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                  <input type="file" accept="image/*" onChange={(e) => setBannerFile(e.target.files[0])} style={{ position: 'absolute', opacity: 0, inset: 0, cursor: 'pointer' }} />
+                  <input type="file" accept="image/*" onChange={(e) => handleImageSelect(e, 'banner')} style={{ position: 'absolute', opacity: 0, inset: 0, cursor: 'pointer' }} />
                   <div style={{ padding: '0.75rem', background: 'var(--glass-bg)', border: '1px dashed var(--glass-border)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', fontSize: '0.8rem', color: 'var(--text-primary)' }}>
                     <Upload size={14} /> {bannerFile ? bannerFile.name : 'Choose File'}
                   </div>
