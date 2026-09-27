@@ -461,7 +461,7 @@ export default function EventDetail() {
                       </div>
                       <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Happening right now — participate now</div>
                     </div>
-                  ) : event.status === 'postponed' || event.status === 'preponed' || event.status === 'upcoming' && isPast ? (
+                  ) : event.status === 'postponed' || event.status === 'preponed' || (event.status === 'upcoming' && isPast) ? (
                     <div style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', opacity: 0.8, marginBottom: '0.25rem' }}>
                         {event.status === 'postponed' ? 'Event Postponed' : event.status === 'preponed' ? 'Event Preponed' : 'Stay Tuned'}
@@ -472,15 +472,43 @@ export default function EventDetail() {
                     </div>
                   ) : (
                     <>
-                      <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                        <Clock size={13} /> {event.status === 'postponed' || event.status === 'preponed' ? 'Rescheduled to' : 'Event starts in'}
+                      {/* Registration Status */}
+                      <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+                        {event.registration_status === 'registrations_closed' ? (
+                          <>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: VERMILION, marginBottom: '0.25rem' }}>Registrations Closed</div>
+                            <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>We are no longer accepting new entries</div>
+                          </>
+                        ) : event.registration_status === 'coming_soon' ? (
+                          <>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: SAFFRON, marginBottom: '0.25rem' }}>Coming Soon</div>
+                            <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Registrations will open shortly</div>
+                          </>
+                        ) : (
+                          <>
+                            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: TEAL, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: TEAL, display: 'inline-block' }} />
+                              {event.registration_status === 'free_entry' ? 'Free Entry Open!' : 'Registrations Open!'}
+                            </div>
+                            <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Secure your spot before time runs out</div>
+                          </>
+                        )}
                       </div>
-                      <div style={{ display: 'flex', gap: '0.4rem' }}>
-                        <CountdownUnit value={days} label="Days" />
-                        <CountdownUnit value={hours} label="Hrs" />
-                        <CountdownUnit value={minutes} label="Min" />
-                        <CountdownUnit value={seconds} label="Sec" />
-                      </div>
+
+                      {/* Timer */}
+                      {(event.registration_status === 'registrations_open' || event.registration_status === 'free_entry' || !event.registration_status) && (
+                        <>
+                          <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                            <Clock size={13} /> {event.status === 'postponed' || event.status === 'preponed' ? 'Rescheduled to' : 'Event starts in'}
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.4rem' }}>
+                            <CountdownUnit value={days} label="Days" />
+                            <CountdownUnit value={hours} label="Hrs" />
+                            <CountdownUnit value={minutes} label="Min" />
+                            <CountdownUnit value={seconds} label="Sec" />
+                          </div>
+                        </>
+                      )}
                     </>
                   )}
                 </div>
