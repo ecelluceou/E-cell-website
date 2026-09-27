@@ -13,6 +13,7 @@ export function EventCountdownCard({
   enableAnimations = true,
   className = "",
   status = "upcoming",
+  isRegistered = false,
 }) {
   // When no date is set, freeze everything at 0
   const dateKnown = date !== null && date !== undefined;
@@ -335,9 +336,9 @@ export function EventCountdownCard({
           whileHover="hover"
           whileTap="tap"
           className={dateKnown && status !== 'ended' ? "ecc-button" : "ecc-button ecc-button-tba"}
-          style={dateKnown && status !== 'ended' ? {} : { cursor: 'default', pointerEvents: 'none', background: status === 'ended' ? 'rgba(255,255,255,0.05)' : '' }}
+          style={dateKnown && status !== 'ended' && !isRegistered ? {} : { cursor: 'default', pointerEvents: 'none', background: status === 'ended' ? 'rgba(255,255,255,0.05)' : isRegistered ? 'rgba(22, 140, 131, 0.15)' : '', color: isRegistered && status !== 'ended' ? 'var(--ecell-teal, #168C83)' : undefined, border: isRegistered && status !== 'ended' ? '1px solid rgba(22, 140, 131, 0.3)' : undefined }}
         >
-          {status === 'ended' ? "Event Ended" : !dateKnown ? "Registrations are yet to open" : (timeLeft > 0 ? "Reserve Your Spot" : "Join Event (Active)")}
+          {status === 'ended' ? "Event Ended" : isRegistered ? "✓ Registered" : !dateKnown ? "Registrations are yet to open" : (timeLeft > 0 ? "Reserve Your Spot" : "Join Event (Active)")}
         </motion.button>
       </div>
     </motion.div>

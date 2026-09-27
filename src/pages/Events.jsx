@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { EventCountdownCard } from '../components/UI/EventCountdownCard';
 import { supabase } from '../lib/supabase';
 import { Loader } from '../components/UI/Loader';
+import { useAuth } from '../contexts/AuthContext';
 
 import { RadialBackground } from '../components/UI/RadialBackground';
 import { SparklesCore } from '../components/UI/Sparkles';
@@ -24,6 +25,8 @@ export default function Events() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [userRegistrations, setUserRegistrations] = useState(new Set());
+  const { user } = useAuth();
 
   React.useEffect(() => {
     async function fetchEvents() {
@@ -45,6 +48,17 @@ export default function Events() {
           })
         );
         
+        let userRegSet = new Set();
+        if (user) {
+          const { data: regData } = await supabase
+            .from('event_registrations')
+            .select('event_id')
+            .eq('user_id', user.id);
+          if (regData) {
+            userRegSet = new Set(regData.map(r => r.event_id));
+          }
+        }
+        setUserRegistrations(userRegSet);
         setEvents(eventsWithCounts);
       } catch (err) {
         console.error('Unexpected error fetching events:', err);
@@ -54,7 +68,7 @@ export default function Events() {
       }
     }
     fetchEvents();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return <Loader />;
@@ -171,6 +185,7 @@ export default function Events() {
                 image={event.image}
                 attendees={event.attendees || 0}
                 status={event.status}
+                isRegistered={userRegistrations.has(event.id)}
                 onJoin={() => navigate(`/events/${event.id}`)}
                 onClick={() => navigate(`/events/${event.id}`)}
               />
