@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, User, Copy, Share2, LogOut, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import { useCaseStudy } from '../hooks/useCaseStudy';
 import { Loader } from '../components/UI/Loader';
 
@@ -11,6 +12,7 @@ const TEAL = '#168C83';
 
 export default function CaseStudyDashboard() {
   const { teamId } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { removeMember, deleteTeam, loading: actionLoading, error: actionError } = useCaseStudy();
   
