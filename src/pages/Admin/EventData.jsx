@@ -58,7 +58,7 @@ export default function EventData() {
           .from('case_study_teams')
           .select(`
             team_name,
-            case_study_members ( id, full_name, email, college, phone, created_at, status )
+            case_study_members ( id, full_name, email, college, phone, created_at, status, is_lead )
           `)
           .eq('event_id', selectedEventId);
           
@@ -74,6 +74,7 @@ export default function EventData() {
                   registered_at: member.created_at,
                   isCaseStudyMember: true,
                   team_name: team.team_name,
+                  role: member.is_lead ? 'Team Lead' : 'Member',
                   profiles: {
                     full_name: member.full_name,
                     email: member.email,
@@ -99,18 +100,22 @@ export default function EventData() {
   const exportCSV = () => {
     if (registrations.length === 0) return;
     const isCaseStudy = registrations[0]?.isCaseStudyMember;
-    const headers = ['Name', 'Email', 'College', 'Phone', isCaseStudy ? 'Team Name' : '', 'Registered At', 'Status'].filter(Boolean);
+    const headers = ['Name', 'Email', 'College', 'Phone', isCaseStudy ? 'Team Name' : '', isCaseStudy ? 'Role' : '', 'Registered At', 'Status'].filter(Boolean);
     const rows = registrations.map(r => {
       const p = r.profiles || {};
-      return [
+      const row = [
         p.full_name || '',
         p.email || '',
         p.college || '',
-        p.phone || '',
-        r.team_name || '',
-        new Date(r.registered_at).toLocaleString(),
-        r.status || 'registered'
-      ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(','); // Escape quotes
+        p.phone || ''
+      ];
+      if (isCaseStudy) {
+        row.push(r.team_name || '');
+        row.push(r.role || 'Participant');
+      }
+      row.push(new Date(r.registered_at).toLocaleString());
+      row.push(r.status || 'registered');
+      return row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','); // Escape quotes
     });
     
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
@@ -194,7 +199,20 @@ export default function EventData() {
                   <td style={{ padding: '1rem' }}>
                     <div style={{ fontWeight: 600 }}>{reg.profiles?.full_name || 'Unknown'}</div>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{reg.profiles?.email}</div>
-                    {reg.team_name && <div style={{ fontSize: '0.75rem', marginTop: '0.2rem', color: 'var(--brand-primary)' }}>Team: {reg.team_name}</div>}
+                    {reg.team_name && (
+                      <div style={{ fontSize: '0.75rem', marginTop: '0.2rem', color: 'var(--brand-primary)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        <span>Team: {reg.team_name}</span>
+                        {reg.role && (
+                          <span style={{ 
+                            background: reg.role === 'Team Lead' ? 'rgba(228,71,46,0.15)' : 'rgba(255,255,255,0.1)', 
+                            color: reg.role === 'Team Lead' ? '#E4472E' : 'var(--text-secondary)',
+                            padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold'
+                          }}>
+                            {reg.role}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </td>
                   <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{reg.profiles?.college || '-'}</td>
                   <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{new Date(reg.registered_at).toLocaleDateString()}</td>
