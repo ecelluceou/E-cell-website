@@ -92,16 +92,16 @@ export default function Home() {
               margin: '0 0 3rem 0',
               maxWidth: '850px',
               // Gradient Text Styles
-              background: 'linear-gradient(135deg, #ffffff 0%, #b4c6fc 50%, #6366f1 100%)',
+              background: 'linear-gradient(135deg, #ffffff 0%, var(--ecell-teal) 50%, var(--ecell-cobalt) 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
               color: 'transparent', // Fallback
-              textShadow: '0 10px 30px rgba(99, 102, 241, 0.15)' // Subtle glow
+              textShadow: '0 10px 30px rgba(22, 140, 131, 0.25)' // Subtle teal glow
             }}>
               Where Ideas Meet Execution<br />
               <span style={{ 
-                background: 'linear-gradient(135deg, #f3f3f3 0%, #888888 100%)',
+                background: 'linear-gradient(135deg, var(--ecell-saffron) 0%, var(--ecell-vermilion) 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text'
@@ -220,12 +220,18 @@ export default function Home() {
               letterSpacing: '0.05em'
             }}
             onMouseOver={(e) => { 
-              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; 
+              e.currentTarget.style.backgroundColor = 'var(--ecell-teal)'; 
+              e.currentTarget.style.borderColor = 'var(--ecell-teal)';
               e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 24px rgba(22, 140, 131, 0.3)';
+              e.currentTarget.style.color = '#fff';
             }}
             onMouseOut={(e) => { 
               e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)'; 
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
               e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.color = 'var(--color-chalk, #f3f3f3)';
             }}
           >
             READ INITIATIVES <ArrowUpRight size={14} />
@@ -284,7 +290,7 @@ export default function Home() {
             padding: 'clamp(24px, 5vw, 48px)',
             backgroundColor: '#000000' // Matches page background
           }}>
-            <Target size={32} strokeWidth={1.5} color="var(--color-compass-gold, #6f6759)" style={{ marginBottom: '1.5rem' }} />
+            <Target size={32} strokeWidth={1.5} color="var(--ecell-saffron, #E5A900)" style={{ marginBottom: '1.5rem' }} />
             <h4 style={{
               fontSize: '14px',
               fontWeight: 400,
@@ -311,7 +317,7 @@ export default function Home() {
             padding: 'clamp(24px, 5vw, 48px)',
             backgroundColor: '#000000'
           }}>
-            <Compass size={32} strokeWidth={1.5} color="var(--color-compass-gold, #6f6759)" style={{ marginBottom: '1.5rem' }} />
+            <Compass size={32} strokeWidth={1.5} color="var(--ecell-teal, #168C83)" style={{ marginBottom: '1.5rem' }} />
             <h4 style={{
               fontSize: '14px',
               fontWeight: 400,
@@ -338,7 +344,7 @@ export default function Home() {
             padding: 'clamp(24px, 5vw, 48px)',
             backgroundColor: '#000000'
           }}>
-            <Users size={32} strokeWidth={1.5} color="var(--color-compass-gold, #6f6759)" style={{ marginBottom: '1.5rem' }} />
+            <Users size={32} strokeWidth={1.5} color="var(--ecell-vermilion, #E4472E)" style={{ marginBottom: '1.5rem' }} />
             <h4 style={{
               fontSize: '14px',
               fontWeight: 400,
@@ -365,7 +371,7 @@ export default function Home() {
             padding: 'clamp(24px, 5vw, 48px)',
             backgroundColor: '#000000'
           }}>
-            <Cpu size={32} strokeWidth={1.5} color="var(--color-compass-gold, #6f6759)" style={{ marginBottom: '1.5rem' }} />
+            <Cpu size={32} strokeWidth={1.5} color="var(--ecell-azure, #3988B8)" style={{ marginBottom: '1.5rem' }} />
             <h4 style={{
               fontSize: '14px',
               fontWeight: 400,
@@ -392,7 +398,7 @@ export default function Home() {
             padding: 'clamp(24px, 5vw, 48px)',
             backgroundColor: '#000000'
           }}>
-            <TrendingUp size={32} strokeWidth={1.5} color="var(--color-compass-gold, #6f6759)" style={{ marginBottom: '1.5rem' }} />
+            <TrendingUp size={32} strokeWidth={1.5} color="var(--ecell-jade, #2F9B78)" style={{ marginBottom: '1.5rem' }} />
             <h4 style={{
               fontSize: '14px',
               fontWeight: 400,
@@ -419,7 +425,7 @@ export default function Home() {
             padding: 'clamp(24px, 5vw, 48px)',
             backgroundColor: '#000000'
           }}>
-            <Rocket size={32} strokeWidth={1.5} color="var(--color-compass-gold, #6f6759)" style={{ marginBottom: '1.5rem' }} />
+            <Rocket size={32} strokeWidth={1.5} color="var(--ecell-coral, #E86F61)" style={{ marginBottom: '1.5rem' }} />
             <h4 style={{
               fontSize: '14px',
               fontWeight: 400,
