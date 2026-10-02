@@ -254,6 +254,167 @@ body {
   }
 }
 
+/* ========== COMPREHENSIVE MOBILE RESPONSIVENESS ========== */
+
+/* ── Navbar: prevent sticky nav from being too narrow on tiny screens ── */
+@media (max-width: 480px) {
+  .main-navbar {
+    top: 0.4rem !important;
+    border-radius: 14px !important;
+  }
+}
+
+/* ── Team Carousel: portrait stack on mobile ── */
+@media (max-width: 600px) {
+  .team-carousel-container {
+    height: auto !important;
+    min-height: 520px;
+  }
+
+  /* force portrait layout: image on top, content below */
+  .team-carousel-container .swiper-slide > div {
+    flex-direction: column !important;
+  }
+
+  .team-carousel-container .swiper-slide > div > div:first-child {
+    width: 100% !important;
+    height: 240px !important;
+    flex: none !important;
+  }
+
+  .team-carousel-container .swiper-slide > div > div:first-child img {
+    object-position: top center;
+  }
+
+  .team-carousel-container .swiper-slide > div > div:last-child {
+    width: 100% !important;
+    padding: 1.25rem !important;
+  }
+}
+
+/* ── Events Grid: full-width cards on small screens ── */
+@media (max-width: 480px) {
+  .ecc-card {
+    max-width: 100% !important;
+  }
+}
+
+/* ── Leaderboard: tighten padding on mobile ── */
+@media (max-width: 600px) {
+  .leaderboard-row {
+    padding: 0.75rem !important;
+  }
+
+  .leaderboard-tabs {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+
+  .leaderboard-tabs button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* ── Initiatives: cards take full width on mobile ── */
+@media (max-width: 500px) {
+  .initiatives-scroll-container > * {
+    width: calc(100vw - 2rem) !important;
+    min-width: calc(100vw - 2rem) !important;
+  }
+}
+
+/* ── JoinUs: single-column on phones ── */
+@media (max-width: 600px) {
+  .join-us-cta-btns {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .join-us-cta-btns a {
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+/* ── Announcements page ── */
+@media (max-width: 600px) {
+  .announcement-meta-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+}
+
+/* ── EventDetail: tighten info grid on mobile ── */
+@media (max-width: 600px) {
+  .event-info-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .event-action-row {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  .event-action-row button,
+  .event-action-row a {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* ── Profile page: tighten on very small screens ── */
+@media (max-width: 480px) {
+  .profile-action-btns {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+  .profile-action-btns button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* ── Auth page ── */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 1.5rem 1rem !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* ── CaseStudy Dashboard: stack panels vertically ── */
+@media (max-width: 768px) {
+  .case-study-layout {
+    flex-direction: column !important;
+  }
+  .case-study-sidebar {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--glass-border);
+  }
+}
+
+/* ── Generic touch-friendly targets ── */
+@media (max-width: 768px) {
+  button, a, [role="button"] {
+    min-height: 40px;
+  }
+
+  /* Prevent horizontal overflow on any page */
+  section, .page-wrapper, main {
+    overflow-x: hidden;
+  }
+}
+
+/* ── Countdown card: full width on mobile grid ── */
+@media (max-width: 640px) {
+  .ecc-card {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
 h1,
 h2,
 h3,

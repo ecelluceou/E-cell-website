@@ -87,7 +87,7 @@ export default function Leaderboard() {
         </motion.div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
+        <div className="leaderboard-tabs" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
           <button 
             onClick={() => setActiveTab('wins')}
             style={{
@@ -127,6 +127,7 @@ export default function Leaderboard() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
+                className="leaderboard-row"
                 style={{
                   display: 'flex', alignItems: 'center', padding: '1rem 1.5rem',
                   background: index < 3 ? getRankColor(index) : 'var(--glass-bg)',

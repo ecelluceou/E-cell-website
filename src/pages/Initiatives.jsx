@@ -82,7 +82,7 @@ export default function Initiatives() {
           Our Initiatives
         </motion.h1>
 
-        <div style={{ 
+        <div className="initiatives-scroll-container" style={{ 
           display: 'flex', 
           overflowX: 'auto', 
           gap: '2rem', 
