@@ -24,7 +24,6 @@ const Leaderboard = React.lazy(() => import('./pages/Leaderboard'));
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import { Loader as RouteLoader } from './components/UI/Loader';
-import AnnouncementPopup from './components/UI/AnnouncementPopup';
 // Paths where the Navbar should be hidden
 const HIDE_NAVBAR_PATHS = ['/auth'];
 
@@ -36,7 +35,6 @@ function Layout() {
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh' }}>
       <a href="#main-content" className="skip-link">Skip to main content</a>
       {!hideNavbar && <Navbar />}
-      <AnnouncementPopup />
 
       {/* Main Content Area */}
       <main id="main-content" style={{ position: 'relative', width: '100%', minHeight: '100vh' }}>
