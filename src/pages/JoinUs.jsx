@@ -162,7 +162,7 @@ export default function JoinUs() {
             style={{ display: 'flex', gap: '1rem', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}
           >
             <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLSf3QUVy2kweTLyp9FkWWS1reIBeVQdcKzmiOw2KI6iLioT3cQ/viewform?usp=dialog"
+              href="https://forms.gle/CsDAGtae6nb88up38"
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -215,7 +215,7 @@ export default function JoinUs() {
             Get into the ecosystem. Discover opportunities, find collaborators, and build the future. Beyond the obvious.
           </p>
           <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLSf3QUVy2kweTLyp9FkWWS1reIBeVQdcKzmiOw2KI6iLioT3cQ/viewform?usp=dialog"
+            href="https://forms.gle/CsDAGtae6nb88up38"
             target="_blank"
             rel="noopener noreferrer"
             style={{
