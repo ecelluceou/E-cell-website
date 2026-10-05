@@ -91,20 +91,13 @@ export default function Home() {
               letterSpacing: '-1.5px',
               margin: '0 0 3rem 0',
               maxWidth: '850px',
-              // Gradient Text Styles
-              background: 'linear-gradient(135deg, #ffffff 0%, var(--ecell-teal) 50%, var(--ecell-cobalt) 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              color: 'transparent', // Fallback
+              // Solid Old Colors
+              color: 'var(--ecell-teal)',
               textShadow: '0 10px 30px rgba(22, 140, 131, 0.25)' // Subtle teal glow
             }}>
               Where Ideas Meet Execution<br />
               <span style={{ 
-                background: 'linear-gradient(135deg, var(--ecell-saffron) 0%, var(--ecell-vermilion) 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
+                color: 'var(--ecell-saffron)'
               }}>E-CELL UCEOU</span>
             </h1>
 
