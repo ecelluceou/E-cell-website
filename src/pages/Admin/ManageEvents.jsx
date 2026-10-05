@@ -33,6 +33,7 @@ export default function ManageEvents() {
       show_participant_count: true,
       registration_type: 'solo',
       members_only: false,
+      max_team_size: '',
       prize: '',
       team_size: ''
     };
@@ -104,7 +105,9 @@ export default function ManageEvents() {
       ...formData,
       date: formData.date ? new Date(formData.date).toISOString() : null,
       highlights: formData.highlights.filter(h => h.trim() !== ''),
-      tags: formData.tags.filter(t => t.trim() !== '')
+      tags: formData.tags.filter(t => t.trim() !== ''),
+      max_team_size: formData.registration_type === 'team' && formData.max_team_size !== '' && formData.max_team_size != null
+        ? Math.max(1, parseInt(formData.max_team_size, 10)) : null
     };
 
     if (isEditing) {
@@ -127,6 +130,7 @@ export default function ManageEvents() {
       status: event.status || 'upcoming',
       show_participant_count: event.show_participant_count !== false,
       members_only: !!event.members_only,
+      max_team_size: event.max_team_size ?? '',
       registration_type: event.registration_type || (event.title?.toLowerCase().includes('case study') ? 'team' : 'solo')
     });
     setIsEditing(true);
@@ -239,6 +243,17 @@ export default function ManageEvents() {
               <option value="solo">👤 Solo Registration (direct sign-up)</option>
               <option value="team">👥 Team Registration (create / join team)</option>
             </select>
+
+            {formData.registration_type === 'team' && (
+              <input
+                type="number"
+                min="1"
+                placeholder="Max members per team (leave empty for no limit)"
+                value={formData.max_team_size}
+                onChange={e => setFormData({...formData, max_team_size: e.target.value})}
+                className="admin-input"
+              />
+            )}
 
             <div style={{ display: 'flex', gap: '1rem' }}>
               <input placeholder="Prize / Reward (e.g. ₹5000 Cash)" value={formData.prize || ''} onChange={e => setFormData({...formData, prize: e.target.value})} className="admin-input" style={{ flex: 1 }} />
