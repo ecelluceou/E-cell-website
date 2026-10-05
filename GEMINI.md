@@ -10,3 +10,6 @@ Treat the guidelines in those skills as absolute foundational rules for this rep
 # Writing & Content Creation Rule
 - Only activate and use the `voice-mirror` skill when the user explicitly or implicitly asks to write a GitHub post, LinkedIn post, or any form of writing (e.g., social posts, release notes, articles, emails, announcements, or documentation copy).
 - Do NOT activate or apply `voice-mirror` for code generation, bug fixing, refactoring, or terminal commands unless accompanying written prose is requested.
+
+# Response Skill Attribution Rule
+- At the end of EVERY response you provide, you MUST explicitly state what skills were used to generate that response (e.g., `**Skills used:** <skill-name-1>, <skill-name-2>`).
