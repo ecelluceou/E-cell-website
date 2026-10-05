@@ -20,8 +20,7 @@ export default function ManageLeaderboard() {
           email,
           phone,
           college,
-          event_registrations ( status ),
-          case_study_members ( status )
+          event_registrations ( status )
         `);
 
       if (error) {
@@ -30,10 +29,25 @@ export default function ManageLeaderboard() {
         return;
       }
 
+      // Fetch case study members separately since there's no FK relation
+      const { data: caseStudyData, error: caseStudyError } = await supabase
+        .from('case_study_members')
+        .select('email, status');
+
+      if (caseStudyError) {
+        console.error('Error fetching case study members:', caseStudyError);
+      }
+
       // Calculate scores
       const processedUsers = data.map(user => {
         const regs = user.event_registrations || [];
-        const caseStudyRegs = user.case_study_members || [];
+        
+        // Find case study registrations for this user by matching email (case insensitive)
+        const userEmail = user.email ? user.email.toLowerCase().trim() : null;
+        const caseStudyRegs = caseStudyData 
+          ? caseStudyData.filter(cs => cs.email && userEmail && cs.email.toLowerCase().trim() === userEmail) 
+          : [];
+          
         const allRegs = [...regs, ...caseStudyRegs];
         
         const wonCount = allRegs.filter(r => r.status === 'won').length;
