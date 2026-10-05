@@ -82,7 +82,7 @@ export default function ManageLeaderboard() {
       return u.wonCount > 0 || u.attendedCount > 0;
     });
 
-    let currentRank = 1;
+    let currentRank = 0;
     let lastScore = null;
     return sorted.map((u, i) => {
       let score;
@@ -92,7 +92,7 @@ export default function ManageLeaderboard() {
       else score = u.wonCount;
 
       if (lastScore !== score) {
-        currentRank = i + 1;
+        currentRank++;
         lastScore = score;
       }
       return { ...u, rank: currentRank };
