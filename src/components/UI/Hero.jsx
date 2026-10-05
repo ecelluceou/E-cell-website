@@ -300,8 +300,9 @@ export default function Hero() {
                     backgroundColor: `rgba(${indicatorColors[idx]}, ${activeCardIndex === idx ? '0.8' : '0.4'})`,
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    padding: 0
+                    transition: 'width 0.3s ease, background-color 0.3s ease',
+                    padding: 0,
+                    outlineOffset: '2px'
                   }}
                   aria-label={`Show card ${idx + 1}`}
                 />

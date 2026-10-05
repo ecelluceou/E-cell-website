@@ -86,7 +86,8 @@ export class ErrorBoundary extends React.Component {
                 border: 'none',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'background-color 0.2s ease, transform 0.2s ease',
+                outlineOffset: '2px'
               }}
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--brand-secondary)'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'var(--brand-primary)'}

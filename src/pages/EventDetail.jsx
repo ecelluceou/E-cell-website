@@ -321,8 +321,9 @@ export default function EventDetail() {
                   display: 'flex', alignItems: 'center', gap: '0.35rem',
                   cursor: saveLoading ? 'not-allowed' : 'pointer', fontWeight: 600, fontSize: '0.8rem',
                   color: isSaved ? VERMILION : 'var(--text-secondary)',
-                  transition: 'all 0.2s ease',
-                  opacity: saveLoading ? 0.7 : 1
+                  transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease',
+                  opacity: saveLoading ? 0.7 : 1,
+                  outlineOffset: '2px'
                 }}
               >
                 <BookmarkPlus size={14} /> {isSaved ? 'Saved' : 'Save'}
@@ -584,7 +585,8 @@ export default function EventDetail() {
                     cursor: regLoading || checking ? 'not-allowed' : 'pointer',
                     fontWeight: 700,
                     fontSize: '0.95rem',
-                    transition: 'all 0.25s ease',
+                    transition: 'background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.25s ease, opacity 0.25s ease',
+                    outlineOffset: '2px',
                     background: (isRegistered || caseStudyTeam)
                       ? 'rgba(22,140,131,0.12)'
                       : '#E4472E',

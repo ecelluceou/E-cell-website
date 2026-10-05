@@ -91,7 +91,7 @@ export default function CaseStudyRegistrationModal({ isOpen, onClose, eventId })
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <button
                   onClick={() => setMode('create')}
-                  style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.5rem', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', color: 'var(--text-primary)', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.5rem', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', color: 'var(--text-primary)', cursor: 'pointer', textAlign: 'left', transition: 'background-color 0.2s, border-color 0.2s', outlineOffset: '2px' }}
                   onMouseOver={(e) => { e.currentTarget.style.borderColor = TEAL; e.currentTarget.style.background = 'rgba(22,140,131,0.05)'; }}
                   onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.background = 'var(--glass-bg)'; }}
                 >
@@ -106,7 +106,7 @@ export default function CaseStudyRegistrationModal({ isOpen, onClose, eventId })
 
                 <button
                   onClick={() => setMode('join')}
-                  style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.5rem', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', color: 'var(--text-primary)', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.5rem', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '16px', color: 'var(--text-primary)', cursor: 'pointer', textAlign: 'left', transition: 'background-color 0.2s, border-color 0.2s', outlineOffset: '2px' }}
                   onMouseOver={(e) => { e.currentTarget.style.borderColor = VERMILION; e.currentTarget.style.background = 'rgba(228,71,46,0.05)'; }}
                   onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; e.currentTarget.style.background = 'var(--glass-bg)'; }}
                 >
@@ -181,7 +181,8 @@ export default function CaseStudyRegistrationModal({ isOpen, onClose, eventId })
                     color: loading ? 'var(--text-muted)' : 'white',
                     border: 'none', borderRadius: '14px',
                     fontWeight: 700, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.2s', display: 'flex', justifyContent: 'center', alignItems: 'center'
+                    transition: 'background-color 0.2s, color 0.2s, transform 0.2s', display: 'flex', justifyContent: 'center', alignItems: 'center',
+                    outlineOffset: '2px'
                   }}
                 >
                   {loading ? 'Processing...' : (mode === 'create' ? 'Create Team' : 'Join Team')}

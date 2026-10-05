@@ -162,6 +162,7 @@ export default function Events() {
               <button
                 key={tab.id}
                 onClick={() => setFilter(tab.id)}
+                className="events-filter-tab"
                 style={{
                   background: filter === tab.id ? 'rgba(228,71,46,0.15)' : 'transparent',
                   border: filter === tab.id ? '1px solid rgba(228,71,46,0.3)' : '1px solid transparent',
@@ -171,7 +172,8 @@ export default function Events() {
                   fontWeight: 600,
                   fontSize: '0.85rem',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease',
+                  outlineOffset: '2px'
                 }}
               >
                 {tab.label}

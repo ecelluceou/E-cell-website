@@ -212,8 +212,9 @@ export default function Home() {
               fontSize: '14px',
               textTransform: 'uppercase',
               textDecoration: 'none',
-              transition: 'all 0.3s ease',
-              letterSpacing: '0.05em'
+              transition: 'background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease',
+              letterSpacing: '0.05em',
+              outlineOffset: '2px'
             }}
             onMouseOver={(e) => { 
               e.currentTarget.style.backgroundColor = 'var(--ecell-teal)'; 

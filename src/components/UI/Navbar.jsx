@@ -339,7 +339,8 @@ export default function Navbar() {
                 borderRadius: '9999px',
                 background: location.pathname === '/profile' ? 'rgba(228,71,46,0.1)' : 'transparent',
                 border: location.pathname === '/profile' ? '1px solid rgba(228,71,46,0.25)' : '1px solid transparent',
-                transition: 'all 0.2s ease'
+                transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease',
+                outlineOffset: '2px'
               }}
             >
               {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
@@ -367,7 +368,7 @@ export default function Navbar() {
                 borderRadius: '9999px',
                 fontWeight: 600,
                 fontSize: '0.85rem',
-                transition: 'all 0.2s ease',
+                transition: 'opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -396,8 +397,9 @@ export default function Navbar() {
               justifyContent: 'center',
               cursor: 'pointer',
               color: 'var(--text-primary)',
-              transition: 'all 0.2s ease',
-              flexShrink: 0
+              transition: 'background-color 0.2s ease, color 0.2s ease',
+              flexShrink: 0,
+              outlineOffset: '2px'
             }}
             onMouseOver={(e) => { e.currentTarget.style.background = 'var(--glass-bg-hover)'; }}
             onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; }}
@@ -503,7 +505,8 @@ export default function Navbar() {
                         fontWeight: isActive ? 700 : 500,
                         fontSize: '1rem',
                         background: isActive ? `${link.iconColor}12` : 'transparent',
-                        transition: 'all 0.15s ease'
+                        transition: 'background-color 0.15s ease, color 0.15s ease',
+                        outlineOffset: '2px'
                       }}
                     >
                       <span style={{ color: isActive ? link.iconColor : '#888', display: 'flex' }}>

@@ -34,7 +34,8 @@ export default function Auth() {
           borderRadius: '9999px',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           boxShadow: '0 4px 14px rgba(0,0,0,0.2)',
-          transition: 'all 0.2s ease'
+          transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
+          outlineOffset: '2px'
         }}
         onMouseOver={(e) => { 
           e.currentTarget.style.transform = 'translateY(-2px)'; 

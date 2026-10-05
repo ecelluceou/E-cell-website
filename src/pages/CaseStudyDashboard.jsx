@@ -150,10 +150,10 @@ export default function CaseStudyDashboard() {
             </div>
             
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button onClick={handleCopy} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.75rem', borderRadius: '12px', color: 'white', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Copy Code">
+              <button onClick={handleCopy} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.75rem', borderRadius: '12px', color: 'white', cursor: 'pointer', transition: 'background-color 0.2s, transform 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Copy Code">
                 {copySuccess ? <span style={{ color: '#4ade80', fontSize: '0.8rem', fontWeight: 700 }}>Copied!</span> : <Copy size={18} />}
               </button>
-              <button onClick={handleShareWhatsApp} style={{ background: '#25D366', border: 'none', padding: '0.75rem', borderRadius: '12px', color: 'white', cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Share on WhatsApp">
+              <button onClick={handleShareWhatsApp} style={{ background: '#25D366', border: 'none', padding: '0.75rem', borderRadius: '12px', color: 'white', cursor: 'pointer', transition: 'background-color 0.2s, transform 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Share on WhatsApp">
                 <Share2 size={18} />
               </button>
             </div>
@@ -199,7 +199,7 @@ export default function CaseStudyDashboard() {
                     borderRadius: '16px',
                     padding: 'clamp(1rem, 3vw, 1.25rem)',
                     display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '1rem',
-                    transition: 'all 0.3s'
+                    transition: 'background-color 0.3s, border-color 0.3s'
                   }}
                 >
                   <div style={{ 

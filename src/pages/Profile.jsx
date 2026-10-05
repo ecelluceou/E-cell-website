@@ -337,7 +337,7 @@ export default function Profile() {
                   display: 'flex', alignItems: 'center', gap: '0.35rem',
                   color: activeTab === tab.key ? 'var(--brand-primary)' : 'var(--text-secondary)',
                   borderBottom: activeTab === tab.key ? '2px solid var(--brand-primary)' : '2px solid transparent',
-                  transition: 'all 0.2s ease', fontFamily: 'var(--font-body)',
+                  transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease', fontFamily: 'var(--font-body)',
                   marginBottom: '-1px', whiteSpace: 'nowrap', flexShrink: 0
                 }}
               >
@@ -365,7 +365,7 @@ export default function Profile() {
                       display: 'flex', alignItems: 'center', gap: '0.75rem',
                       padding: '0.75rem 1rem', borderRadius: '12px',
                       border: '1px solid var(--glass-border)',
-                      cursor: 'pointer', transition: 'all 0.2s ease',
+                      cursor: 'pointer', transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
                       background: 'var(--glass-bg)'
                     }}
                     whileHover={{ x: 4, background: 'rgba(22,140,131,0.04)', borderColor: 'rgba(22,140,131,0.2)' }}
@@ -417,7 +417,7 @@ export default function Profile() {
                   border: '1.5px dashed rgba(22,140,131,0.35)',
                   color: 'var(--brand-primary)', fontWeight: 600, fontSize: '0.85rem',
                   textDecoration: 'none', marginTop: '0.15rem',
-                  transition: 'all 0.2s ease'
+                  transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease'
                 }}>
                   + Browse events
                 </Link>
@@ -438,7 +438,7 @@ export default function Profile() {
                         display: 'flex', alignItems: 'center', gap: '0.75rem',
                         padding: '0.75rem 1rem', borderRadius: '12px',
                         border: '1px solid var(--glass-border)',
-                        cursor: 'pointer', transition: 'all 0.2s ease',
+                        cursor: 'pointer', transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
                         background: 'var(--glass-bg)'
                       }}
                       whileHover={{ x: 4, background: 'rgba(229,169,0,0.04)', borderColor: 'rgba(229,169,0,0.2)' }}

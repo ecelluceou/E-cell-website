@@ -123,7 +123,7 @@ export default function Announcements() {
                 gap: '1rem',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease',
+                transition: 'box-shadow 0.3s ease, transform 0.3s ease',
                 cursor: 'pointer'
               }}
             >
