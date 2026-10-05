@@ -167,7 +167,7 @@ export default function EventData() {
               border: '1px solid var(--glass-border)', borderRadius: '8px', cursor: 'pointer'
             }}
           >
-            {events.map(ev => <option key={ev.id} value={ev.id}>{ev.title}</option>)}
+            {events.map(ev => <option key={ev.id} value={ev.id} style={{ background: '#222', color: 'white' }}>{ev.title}</option>)}
           </select>
 
           <motion.button 
