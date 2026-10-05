@@ -21,7 +21,8 @@ export default function Leaderboard() {
           full_name,
           avatar_url,
           college,
-          event_registrations ( status )
+          event_registrations ( status ),
+          case_study_members ( status )
         `);
 
       if (error) {
@@ -33,8 +34,11 @@ export default function Leaderboard() {
       // Calculate scores
       const processedUsers = data.map(user => {
         const regs = user.event_registrations || [];
-        const wonCount = regs.filter(r => r.status === 'won').length;
-        const attendedCount = regs.filter(r => r.status === 'attended' || r.status === 'won').length;
+        const caseStudyRegs = user.case_study_members || [];
+        const allRegs = [...regs, ...caseStudyRegs];
+        
+        const wonCount = allRegs.filter(r => r.status === 'won').length;
+        const attendedCount = allRegs.filter(r => r.status === 'attended' || r.status === 'won').length;
         return { ...user, wonCount, attendedCount };
       });
 
