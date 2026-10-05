@@ -1,72 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, Utensils } from 'lucide-react';
+import { X, ArrowRight, Megaphone } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../contexts/AuthContext';
 
 const VERMILION = '#E4472E';
-const CASE_STUDY_EVENT_ID = 'Case-Study';
+const SEEN_KEY = 'seenPopupAnnouncements';
 
+const getSeen = () => {
+  try { return JSON.parse(sessionStorage.getItem(SEEN_KEY) || '[]'); } catch { return []; }
+};
+
+/**
+ * Shows the latest active popup announcement (managed via Admin → Popup Announcements).
+ * Each announcement is shown once per browser session, on the home page only.
+ */
 export default function AnnouncementPopup() {
+  const [announcement, setAnnouncement] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
 
   useEffect(() => {
-    // Only trigger on the home page
     if (location.pathname !== '/') return;
+    let cancelled = false;
+    let timer;
 
-    // Only show once per session
-    const hasSeen = sessionStorage.getItem('hasSeenCaseStudyAnnouncement');
-    if (hasSeen) return;
-
-    async function checkAndShow() {
-      if (user) {
-        // Check regular event_registrations
-        const { data: reg } = await supabase
-          .from('event_registrations')
-          .select('id')
-          .eq('event_id', CASE_STUDY_EVENT_ID)
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        // Check case_study_members (team-based registration)
-        const { data: member } = await supabase
-          .from('case_study_members')
-          .select('id')
-          .eq('email', user.email)
-          .maybeSingle();
-
-        if (reg || member) {
-          // Already registered — mark as seen, don't show
-          sessionStorage.setItem('hasSeenCaseStudyAnnouncement', 'true');
-          return;
-        }
-      }
-
-      // Not registered (or not logged in) → show after short delay
-      const timer = setTimeout(() => {
+    async function load() {
+      const { data, error } = await supabase
+        .from('popup_announcements')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+      if (cancelled || error || !data) return;
+      const seen = getSeen();
+      const next = data.find((a) => !seen.includes(a.id));
+      if (!next) return;
+      timer = setTimeout(() => {
+        setAnnouncement(next);
         setIsOpen(true);
-        sessionStorage.setItem('hasSeenCaseStudyAnnouncement', 'true');
+        sessionStorage.setItem(SEEN_KEY, JSON.stringify([...getSeen(), next.id]));
       }, 1200);
-      return () => clearTimeout(timer);
     }
 
-    checkAndShow();
-  }, [location.pathname, user]);
+    load();
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [location.pathname]);
 
   const handleClose = () => setIsOpen(false);
 
-  const handleCheckOut = () => {
+  const handleAction = () => {
     setIsOpen(false);
-    navigate(`/events/${CASE_STUDY_EVENT_ID}`);
+    const link = announcement?.button_link;
+    if (!link) return;
+    if (/^https?:\/\//i.test(link)) window.open(link, '_blank', 'noopener,noreferrer');
+    else navigate(link);
   };
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && announcement && (
         <div style={{
           position: 'fixed',
           top: 0, left: 0, right: 0, bottom: 0,
@@ -105,7 +98,7 @@ export default function AnnouncementPopup() {
               border: '1px solid var(--glass-border)',
               borderRadius: '24px',
               padding: '2rem',
-              color: 'white',
+              color: 'var(--text-primary)',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
               overflow: 'hidden'
             }}
@@ -123,13 +116,14 @@ export default function AnnouncementPopup() {
             {/* Close Button */}
             <button
               onClick={handleClose}
+              aria-label="Close announcement"
               style={{
                 position: 'absolute',
                 top: '1rem',
                 right: '1rem',
                 background: 'rgba(255, 255, 255, 0.1)',
                 border: 'none',
-                color: 'white',
+                color: 'var(--text-primary)',
                 width: '32px',
                 height: '32px',
                 borderRadius: '50%',
@@ -145,47 +139,51 @@ export default function AnnouncementPopup() {
               <X size={18} />
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', color: VERMILION }}>
-              <Utensils size={28} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', color: VERMILION, paddingRight: '2rem' }}>
+              <Megaphone size={28} style={{ flexShrink: 0 }} />
               <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, lineHeight: 1.2 }}>
-                The Current Dish in E-CELL
+                {announcement.title}
               </h2>
             </div>
-            
-            <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: 1.5 }}>
-              We've just launched a new <strong>Case Study Event</strong>! Gather your team, put on your thinking caps, and get ready to solve real-world problems.
-            </p>
 
-            <button
-              onClick={handleCheckOut}
-              style={{
-                width: '100%',
-                padding: '1rem',
-                background: VERMILION,
-                border: 'none',
-                borderRadius: '12px',
-                color: 'white',
-                fontSize: '1rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                boxShadow: '0 4px 14px 0 rgba(228,71,46,0.39)',
-                transition: 'transform 0.2s, box-shadow 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(228,71,46,0.23)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(228,71,46,0.39)';
-              }}
-            >
-              Check it out <ArrowRight size={18} />
-            </button>
+            {announcement.message && (
+              <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: 1.5, whiteSpace: 'pre-line' }}>
+                {announcement.message}
+              </p>
+            )}
+
+            {announcement.button_link && (
+              <button
+                onClick={handleAction}
+                style={{
+                  width: '100%',
+                  padding: '1rem',
+                  background: VERMILION,
+                  border: 'none',
+                  borderRadius: '12px',
+                  color: 'white',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  boxShadow: '0 4px 14px 0 rgba(228,71,46,0.39)',
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 6px 20px rgba(228,71,46,0.23)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 4px 14px 0 rgba(228,71,46,0.39)';
+                }}
+              >
+                {announcement.button_text || 'Check it out'} <ArrowRight size={18} />
+              </button>
+            )}
           </motion.div>
         </div>
       )}

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, Routes, Route, useLocation } from 'react-router-dom';
-import { Calendar, Award, Database, Users, Settings, ChevronRight } from 'lucide-react';
+import { Calendar, Award, Database, Users, Settings, ChevronRight, Megaphone, UserPlus } from 'lucide-react';
 import ManageEvents from './ManageEvents';
 import ManageInitiatives from './ManageInitiatives';
+import ManagePopups from './ManagePopups';
+import ManageTeam from './ManageTeam';
 import EventData from './EventData';
 
 export default function AdminDashboard() {
@@ -13,6 +15,8 @@ export default function AdminDashboard() {
     { name: 'Dashboard Home', path: '/admin', icon: <Settings size={20} /> },
     { name: 'Manage Events', path: '/admin/events', icon: <Calendar size={20} /> },
     { name: 'Manage Initiatives', path: '/admin/initiatives', icon: <Award size={20} /> },
+    { name: 'Popup Announcements', path: '/admin/popups', icon: <Megaphone size={20} /> },
+    { name: 'Manage Team', path: '/admin/team', icon: <UserPlus size={20} /> },
     { name: 'Event Data & Attendance', path: '/admin/data', icon: <Database size={20} /> },
     { name: 'User Leaderboards', path: '/admin/leaderboards', icon: <Users size={20} /> },
   ];
@@ -68,6 +72,8 @@ export default function AdminDashboard() {
           } />
           <Route path="/events" element={<ManageEvents />} />
           <Route path="/initiatives" element={<ManageInitiatives />} />
+          <Route path="/popups" element={<ManagePopups />} />
+          <Route path="/team" element={<ManageTeam />} />
           <Route path="/data" element={<EventData />} />
           <Route path="/leaderboards" element={<div>Manage Leaderboards (Coming Soon)</div>} />
         </Routes>
