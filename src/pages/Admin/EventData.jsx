@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { Loader } from '../../components/UI/Loader';
 import { Download, CheckCircle, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { isTeamEvent } from '../../lib/eventType';
 
 export default function EventData() {
   const [events, setEvents] = useState([]);
@@ -13,7 +14,7 @@ export default function EventData() {
   // Fetch all events for the dropdown
   useEffect(() => {
     async function loadEvents() {
-      const { data } = await supabase.from('events').select('id, title').order('date', { ascending: false });
+      const { data } = await supabase.from('events').select('id, title, registration_type').order('date', { ascending: false });
       setEvents(data || []);
       if (data && data.length > 0) {
         setSelectedEventId(data[0].id);
@@ -31,7 +32,7 @@ export default function EventData() {
       setLoading(true);
       
       const selectedEvent = events.find(ev => ev.id === selectedEventId);
-      const isCaseStudy = selectedEvent?.title?.toLowerCase().includes('case study');
+      const isCaseStudy = isTeamEvent(selectedEvent);
 
       let allRegs = [];
 

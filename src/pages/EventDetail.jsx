@@ -11,6 +11,7 @@ import { useEventSave } from '../hooks/useEventSave';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import CaseStudyRegistrationModal from '../components/UI/CaseStudyRegistrationModal';
+import { isTeamEvent } from '../lib/eventType';
 
 // ─── Palette ────────────────────────────────────────────────────────────────
 const VERMILION = '#E4472E';
@@ -59,7 +60,7 @@ export default function EventDetail() {
   const [winners, setWinners] = useState([]);
   const [isCaseStudyModalOpen, setIsCaseStudyModalOpen] = useState(false);
   const [caseStudyTeam, setCaseStudyTeam] = useState(null);
-  const isCaseStudy = event?.title?.toLowerCase().includes('case study');
+  const isCaseStudy = isTeamEvent(event);
 
   useEffect(() => {
     async function fetchCaseStudyTeam() {
@@ -592,7 +593,7 @@ export default function EventDetail() {
                           ? 'Go to Team Dashboard →'
                           : isRegistered
                             ? '✓ Registered — Click to Cancel'
-                            : isCaseStudy ? 'Register for Case Study →' : 'Reserve Your Spot →'}
+                            : isCaseStudy ? 'Register Your Team →' : 'Reserve Your Spot →'}
                 </motion.button>
               ) : (
                 <div style={{

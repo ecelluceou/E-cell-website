@@ -31,6 +31,7 @@ export default function ManageEvents() {
       status: 'upcoming',
       registration_status: 'registrations_open',
       show_participant_count: true,
+      registration_type: 'solo',
       prize: '',
       team_size: ''
     };
@@ -123,7 +124,8 @@ export default function ManageEvents() {
       highlights: event.highlights?.length ? event.highlights : [''],
       tags: event.tags?.length ? event.tags : [''],
       status: event.status || 'upcoming',
-      show_participant_count: event.show_participant_count !== false
+      show_participant_count: event.show_participant_count !== false,
+      registration_type: event.registration_type || (event.title?.toLowerCase().includes('case study') ? 'team' : 'solo')
     });
     setIsEditing(true);
   };
@@ -213,6 +215,17 @@ export default function ManageEvents() {
                 Show Participant Count
               </label>
             </div>
+
+            {/* Registration Type: solo vs team */}
+            <select
+              value={formData.registration_type}
+              onChange={e => setFormData({...formData, registration_type: e.target.value})}
+              className="admin-input"
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="solo">👤 Solo Registration (direct sign-up)</option>
+              <option value="team">👥 Team Registration (create / join team)</option>
+            </select>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
               <input placeholder="Prize / Reward (e.g. ₹5000 Cash)" value={formData.prize || ''} onChange={e => setFormData({...formData, prize: e.target.value})} className="admin-input" style={{ flex: 1 }} />
