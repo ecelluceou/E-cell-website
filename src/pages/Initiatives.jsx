@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { Loader } from '../components/UI/Loader';
+import { useAuth } from '../contexts/AuthContext';
+import MembersOnlyModal from '../components/UI/MembersOnlyModal';
 
 import { RadialBackground } from '../components/UI/RadialBackground';
 import { SparklesCore } from '../components/UI/Sparkles';
@@ -25,6 +27,9 @@ Fill out a quick form and tell us what you're building — we'll take it from th
 ];
 
 export default function Initiatives() {
+  const { profile } = useAuth();
+  const isMember = !!profile?.is_member || profile?.role === 'admin';
+  const [gatedItem, setGatedItem] = useState(null);
   const [initiatives, setInitiatives] = useState(DEFAULT_INITIATIVES);
   const [loading, setLoading] = useState(true);
 
@@ -134,6 +139,13 @@ export default function Initiatives() {
                       </span>
                     </div>
                   )}
+                  {initiative.members_only && (
+                    <div style={{ marginBottom: '0.75rem' }}>
+                      <span style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0.3rem 0.75rem', borderRadius: '100px', background: 'rgba(229,169,0,0.12)', color: '#E5A900', border: '1px solid rgba(229,169,0,0.35)' }}>
+                        👑 Members Only
+                      </span>
+                    </div>
+                  )}
                   <h3 style={{ fontSize: '1.4rem', marginBottom: '1rem', color: 'var(--brand-primary)', lineHeight: 1.3 }}>
                     {initiative.title}
                   </h3>
@@ -154,6 +166,12 @@ export default function Initiatives() {
                       href={initiative.link}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={(e) => {
+                        if (initiative.members_only && !isMember) {
+                          e.preventDefault();
+                          setGatedItem(initiative);
+                        }
+                      }}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -177,6 +195,7 @@ export default function Initiatives() {
             ))}
         </div>
       </div>
+      <MembersOnlyModal isOpen={!!gatedItem} onClose={() => setGatedItem(null)} itemName={gatedItem?.title} />
     </div>
   );
 }

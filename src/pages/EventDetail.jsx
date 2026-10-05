@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import CaseStudyRegistrationModal from '../components/UI/CaseStudyRegistrationModal';
 import { isTeamEvent } from '../lib/eventType';
+import MembersOnlyModal from '../components/UI/MembersOnlyModal';
 
 // ─── Palette ────────────────────────────────────────────────────────────────
 const VERMILION = '#E4472E';
@@ -52,7 +53,7 @@ export default function EventDetail() {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const { isRegistered, count, loading: regLoading, checking, register, unregister, checkStatus } = useEventRegistration(id);
   const { isSaved, loading: saveLoading, toggleSave } = useEventSave(id);
@@ -61,6 +62,9 @@ export default function EventDetail() {
   const [isCaseStudyModalOpen, setIsCaseStudyModalOpen] = useState(false);
   const [caseStudyTeam, setCaseStudyTeam] = useState(null);
   const isCaseStudy = isTeamEvent(event);
+  const [showMembersModal, setShowMembersModal] = useState(false);
+  const isMember = !!profile?.is_member || profile?.role === 'admin';
+  const membersBlocked = !!event?.members_only && !isMember;
 
   useEffect(() => {
     async function fetchCaseStudyTeam() {
@@ -296,6 +300,11 @@ export default function EventDetail() {
               <p style={{ color: TEAL, fontWeight: 600, margin: '0.4rem 0 0', fontSize: 'clamp(0.82rem, 2vw, 1rem)' }}>
                 {event.tagline}
               </p>
+              {event.members_only && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.6rem', padding: '0.25rem 0.75rem', borderRadius: '9999px', background: 'rgba(229,169,0,0.12)', color: SAFFRON, border: '1px solid rgba(229,169,0,0.35)', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                  👑 Members Only
+                </span>
+              )}
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
               <motion.button
@@ -553,6 +562,7 @@ export default function EventDetail() {
                 <motion.button
                   onClick={async () => {
                     if (!user) { navigate('/auth'); return; }
+                    if (membersBlocked && !isRegistered && !caseStudyTeam) { setShowMembersModal(true); return; }
                     if (isCaseStudy) {
                       if (caseStudyTeam) {
                         navigate(`/events/case-study/dashboard/${caseStudyTeam.team_id}`);
@@ -591,8 +601,10 @@ export default function EventDetail() {
                         ? '🔒 Sign in to Register'
                         : caseStudyTeam
                           ? 'Go to Team Dashboard →'
-                          : isRegistered
-                            ? '✓ Registered — Click to Cancel'
+                          : membersBlocked && !isRegistered
+                            ? '👑 Members Only — Get Membership'
+                            : isRegistered
+                              ? '✓ Registered — Click to Cancel'
                             : isCaseStudy ? 'Register Your Team →' : 'Reserve Your Spot →'}
                 </motion.button>
               ) : (
@@ -666,6 +678,7 @@ export default function EventDetail() {
         </div>
       )}
 
+      <MembersOnlyModal isOpen={showMembersModal} onClose={() => setShowMembersModal(false)} itemName={event.title} />
       <CaseStudyRegistrationModal 
         isOpen={isCaseStudyModalOpen} 
         onClose={() => setIsCaseStudyModalOpen(false)}

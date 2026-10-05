@@ -37,6 +37,7 @@ export default function ManageInitiatives() {
       description: '',
       image: '',
       link: '',
+      members_only: false,
       status: 'active'
     };
   }
@@ -165,6 +166,16 @@ export default function ManageInitiatives() {
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
+            </select>
+
+            <select
+              value={formData.members_only ? 'members' : 'open'}
+              onChange={e => setFormData({...formData, members_only: e.target.value === 'members'})}
+              className="admin-input"
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="open">🌐 Open for All</option>
+              <option value="members">👑 Members Only (visible to all, joining needs membership)</option>
             </select>
 
             {/* Image Upload */}

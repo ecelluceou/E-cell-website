@@ -32,6 +32,7 @@ export default function ManageEvents() {
       registration_status: 'registrations_open',
       show_participant_count: true,
       registration_type: 'solo',
+      members_only: false,
       prize: '',
       team_size: ''
     };
@@ -125,6 +126,7 @@ export default function ManageEvents() {
       tags: event.tags?.length ? event.tags : [''],
       status: event.status || 'upcoming',
       show_participant_count: event.show_participant_count !== false,
+      members_only: !!event.members_only,
       registration_type: event.registration_type || (event.title?.toLowerCase().includes('case study') ? 'team' : 'solo')
     });
     setIsEditing(true);
@@ -215,6 +217,17 @@ export default function ManageEvents() {
                 Show Participant Count
               </label>
             </div>
+
+            {/* Access: open to all vs members only */}
+            <select
+              value={formData.members_only ? 'members' : 'open'}
+              onChange={e => setFormData({...formData, members_only: e.target.value === 'members'})}
+              className="admin-input"
+              style={{ cursor: 'pointer' }}
+            >
+              <option value="open">🌐 Open for All</option>
+              <option value="members">👑 Members Only (visible to all, registration needs membership)</option>
+            </select>
 
             {/* Registration Type: solo vs team */}
             <select
