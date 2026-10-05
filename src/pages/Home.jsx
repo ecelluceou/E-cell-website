@@ -97,7 +97,7 @@ export default function Home() {
             }}>
               Where Ideas Meet Execution<br />
               <span style={{ 
-                background: 'linear-gradient(135deg, var(--ecell-saffron) 0%, var(--ecell-vermilion) 100%)',
+                background: 'linear-gradient(135deg, #ffffff 0%, #b3b3b3 50%, #737373 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text'
