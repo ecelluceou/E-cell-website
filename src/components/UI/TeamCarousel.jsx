@@ -18,7 +18,7 @@ const InstagramIcon = ({ size }) => (
     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
   </svg>
 );
-import { Autoplay, EffectCreative, Pagination, Navigation } from "swiper/modules";
+import { Autoplay, EffectCreative, Pagination, Navigation, Keyboard } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import "swiper/css";
@@ -70,7 +70,14 @@ export default function TeamCarousel() {
       display: none !important;
     }
 
+    .team-carousel-container .swiper-pagination {
+      z-index: 20;
+      pointer-events: auto;
+    }
+
     .team-carousel-container .swiper-pagination-bullet {
+      cursor: pointer;
+      pointer-events: auto;
       background-color: var(--brand-primary) !important;
       width: 10px;
       height: 10px;
@@ -154,6 +161,8 @@ export default function TeamCarousel() {
           pagination={{
             clickable: true,
           }}
+          keyboard={{ enabled: true, onlyInViewport: true }}
+          a11y={{ enabled: true }}
           creativeEffect={{
             prev: {
               shadow: false,
@@ -169,7 +178,7 @@ export default function TeamCarousel() {
             prevEl: '.custom-nav-prev',
             nextEl: '.custom-nav-next',
           }}
-          modules={[EffectCreative, Pagination, Autoplay, Navigation]}
+          modules={[EffectCreative, Pagination, Autoplay, Navigation, Keyboard]}
           className="team-carousel-container"
         >
           {teamMembers.map((member, index) => (
