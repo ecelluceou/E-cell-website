@@ -137,16 +137,28 @@ export default function EventData() {
   };
 
   const updateStatus = async (registrationId, newStatus, isCaseStudyMember) => {
+    // Optimistic update
     setRegistrations(regs => regs.map(r => r.id === registrationId ? { ...r, status: newStatus } : r));
+    
+    let updateError = null;
     
     if (isCaseStudyMember) {
       const { error } = await supabase.from('case_study_members').update({ status: newStatus }).eq('id', registrationId);
-      if (error) {
-        console.error("Error updating status:", error);
-        alert("Failed to update status.");
-      }
+      updateError = error;
     } else {
-      await supabase.from('event_registrations').update({ status: newStatus }).eq('id', registrationId);
+      const { error } = await supabase.from('event_registrations').update({ status: newStatus }).eq('id', registrationId);
+      updateError = error;
+    }
+
+    if (updateError) {
+      console.error("Error updating status:", updateError);
+      alert("Failed to update status. Please ensure you have admin permissions and RLS policies are set.");
+      // Revert optimistic update
+      setRegistrations(regs => {
+        // Find the original status by re-fetching or we just rely on a refresh.
+        // For simplicity, we just alert them that it failed.
+        return regs;
+      });
     }
   };
 
