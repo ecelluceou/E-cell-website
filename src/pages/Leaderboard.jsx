@@ -52,9 +52,11 @@ export default function Leaderboard() {
           
         const allRegs = [...regs, ...caseStudyRegs];
         
-        const wonCount = allRegs.filter(r => r.status === 'won').length;
+        const soloWonCount = regs.filter(r => r.status === 'won').length;
+        const teamWonCount = caseStudyRegs.filter(r => r.status === 'won').length;
+        const wonCount = soloWonCount + teamWonCount;
         const attendedCount = allRegs.filter(r => r.status === 'attended' || r.status === 'won').length;
-        return { ...user, wonCount, attendedCount };
+        return { ...user, soloWonCount, teamWonCount, wonCount, attendedCount };
       });
 
       setUsers(processedUsers);
@@ -63,19 +65,46 @@ export default function Leaderboard() {
     fetchLeaderboard();
   }, []);
 
-  const getRankColor = (index) => {
-    if (index === 0) return 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)'; // Gold
-    if (index === 1) return 'linear-gradient(135deg, #E0E0E0 0%, #9E9E9E 100%)'; // Silver
-    if (index === 2) return 'linear-gradient(135deg, #CD7F32 0%, #A0522D 100%)'; // Bronze
+  const getRankColor = (rank) => {
+    if (rank === 1) return 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)'; // Gold
+    if (rank === 2) return 'linear-gradient(135deg, #E0E0E0 0%, #9E9E9E 100%)'; // Silver
+    if (rank === 3) return 'linear-gradient(135deg, #CD7F32 0%, #A0522D 100%)'; // Bronze
     return 'var(--glass-bg)';
   };
 
-  const sortedUsers = [...users].sort((a, b) => {
-    if (activeTab === 'wins') {
+  const getRankedUsers = () => {
+    let sorted = [...users].sort((a, b) => {
+      if (activeTab === 'solo_wins') return b.soloWonCount - a.soloWonCount || b.attendedCount - a.attendedCount;
+      if (activeTab === 'team_wins') return b.teamWonCount - a.teamWonCount || b.attendedCount - a.attendedCount;
+      if (activeTab === 'attendance') return b.attendedCount - a.attendedCount || b.wonCount - a.wonCount;
       return b.wonCount - a.wonCount || b.attendedCount - a.attendedCount;
-    }
-    return b.attendedCount - a.attendedCount || b.wonCount - a.wonCount;
-  }).filter(u => activeTab === 'wins' ? u.wonCount > 0 : u.attendedCount > 0);
+    });
+
+    sorted = sorted.filter(u => {
+      if (activeTab === 'solo_wins') return u.soloWonCount > 0;
+      if (activeTab === 'team_wins') return u.teamWonCount > 0;
+      if (activeTab === 'attendance') return u.attendedCount > 0;
+      return u.wonCount > 0 || u.attendedCount > 0;
+    });
+
+    let currentRank = 1;
+    let lastScore = null;
+    return sorted.map((u, i) => {
+      let score;
+      if (activeTab === 'solo_wins') score = u.soloWonCount;
+      else if (activeTab === 'team_wins') score = u.teamWonCount;
+      else if (activeTab === 'attendance') score = u.attendedCount;
+      else score = u.wonCount;
+
+      if (lastScore !== score) {
+        currentRank = i + 1;
+        lastScore = score;
+      }
+      return { ...u, rank: currentRank };
+    });
+  };
+
+  const displayedUsers = getRankedUsers();
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', background: 'var(--bg-primary)', overflow: 'hidden' }}>
@@ -106,41 +135,38 @@ export default function Leaderboard() {
         </motion.div>
 
         {/* Tabs */}
-        <div className="leaderboard-tabs" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem' }}>
-          <button 
-            onClick={() => setActiveTab('wins')}
-            style={{
-              padding: '0.8rem 1.5rem', borderRadius: '999px', fontWeight: 600, border: 'none', cursor: 'pointer',
-              background: activeTab === 'wins' ? '#E5A900' : 'var(--glass-bg)',
-              color: activeTab === 'wins' ? '#000' : 'white',
-              transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', gap: '0.5rem'
-            }}
-          >
-            <Trophy size={16} /> Most Wins
-          </button>
-          <button 
-            onClick={() => setActiveTab('attendance')}
-            style={{
-              padding: '0.8rem 1.5rem', borderRadius: '999px', fontWeight: 600, border: 'none', cursor: 'pointer',
-              background: activeTab === 'attendance' ? '#168C83' : 'var(--glass-bg)',
-              color: activeTab === 'attendance' ? '#fff' : 'white',
-              transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', gap: '0.5rem'
-            }}
-          >
-            <Award size={16} /> Most Attended
-          </button>
+        <div className="leaderboard-tabs" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+          {[
+            { id: 'wins', label: 'Overall Wins', icon: Trophy, color: '#E5A900', textColor: '#000' },
+            { id: 'solo_wins', label: 'Solo Wins', icon: Trophy, color: '#E5A900', textColor: '#000' },
+            { id: 'team_wins', label: 'Team Wins', icon: Trophy, color: '#E5A900', textColor: '#000' },
+            { id: 'attendance', label: 'Most Attended', icon: Award, color: '#168C83', textColor: '#fff' }
+          ].map(tab => (
+            <button 
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '0.8rem 1.5rem', borderRadius: '999px', fontWeight: 600, border: 'none', cursor: 'pointer',
+                background: activeTab === tab.id ? tab.color : 'var(--glass-bg)',
+                color: activeTab === tab.id ? tab.textColor : 'white',
+                transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', gap: '0.5rem'
+              }}
+            >
+              <tab.icon size={16} /> {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* List */}
         {loading ? (
           <div style={{ padding: '4rem', textAlign: 'center' }}><Loader /></div>
-        ) : sortedUsers.length === 0 ? (
+        ) : displayedUsers.length === 0 ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)', background: 'var(--glass-bg)', borderRadius: '24px' }}>
             No one has ranked yet. Join events to climb the leaderboard!
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {sortedUsers.map((user, index) => (
+            {displayedUsers.map((user, index) => (
               <motion.div 
                 key={user.id}
                 initial={{ opacity: 0, x: -20 }}
@@ -149,14 +175,14 @@ export default function Leaderboard() {
                 className="leaderboard-row"
                 style={{
                   display: 'flex', alignItems: 'center', padding: '1rem 1.5rem',
-                  background: index < 3 ? getRankColor(index) : 'var(--glass-bg)',
-                  borderRadius: '16px', border: index >= 3 ? '1px solid var(--glass-border)' : 'none',
-                  color: index < 3 ? (index === 0 ? '#000' : '#fff') : 'var(--text-primary)',
-                  boxShadow: index < 3 ? '0 10px 30px rgba(0,0,0,0.2)' : 'none',
-                  transform: index === 0 ? 'scale(1.02)' : 'none'
+                  background: user.rank <= 3 ? getRankColor(user.rank) : 'var(--glass-bg)',
+                  borderRadius: '16px', border: user.rank > 3 ? '1px solid var(--glass-border)' : 'none',
+                  color: user.rank <= 3 ? (user.rank === 1 ? '#000' : '#fff') : 'var(--text-primary)',
+                  boxShadow: user.rank <= 3 ? '0 10px 30px rgba(0,0,0,0.2)' : 'none',
+                  transform: user.rank === 1 ? 'scale(1.02)' : 'none'
                 }}
               >
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, width: '40px', opacity: 0.8 }}>#{index + 1}</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, width: '40px', opacity: 0.8 }}>#{user.rank}</div>
                 <img 
                   src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
                   alt={user.full_name} 
@@ -168,11 +194,11 @@ export default function Leaderboard() {
                 </div>
                 <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem' }}>
                   <div style={{ fontWeight: 800, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    {activeTab === 'wins' ? user.wonCount : user.attendedCount}
-                    {activeTab === 'wins' ? <Trophy size={16} /> : <Award size={16} />}
+                    {activeTab === 'solo_wins' ? user.soloWonCount : activeTab === 'team_wins' ? user.teamWonCount : activeTab === 'attendance' ? user.attendedCount : user.wonCount}
+                    {activeTab === 'attendance' ? <Award size={16} /> : <Trophy size={16} />}
                   </div>
                   <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.8 }}>
-                    {activeTab === 'wins' ? 'Events Won' : 'Events Attended'}
+                    {activeTab === 'attendance' ? 'Events Attended' : 'Events Won'}
                   </div>
                 </div>
               </motion.div>

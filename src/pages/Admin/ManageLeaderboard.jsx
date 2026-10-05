@@ -8,6 +8,8 @@ export default function ManageLeaderboard() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [activeTab, setActiveTab] = useState('overall_wins'); // 'overall_wins' | 'solo_wins' | 'team_wins' | 'attendance'
+
   useEffect(() => {
     async function fetchLeaderboard() {
       setLoading(true);
@@ -50,31 +52,66 @@ export default function ManageLeaderboard() {
           
         const allRegs = [...regs, ...caseStudyRegs];
         
-        const wonCount = allRegs.filter(r => r.status === 'won').length;
+        const soloWonCount = regs.filter(r => r.status === 'won').length;
+        const teamWonCount = caseStudyRegs.filter(r => r.status === 'won').length;
+        const wonCount = soloWonCount + teamWonCount;
         const attendedCount = allRegs.filter(r => r.status === 'attended' || r.status === 'won').length;
-        return { ...user, wonCount, attendedCount };
+        
+        return { ...user, soloWonCount, teamWonCount, wonCount, attendedCount };
       });
 
-      // Sort by total wins, then attendance, then filter out 0s
-      const sortedUsers = processedUsers
-        .sort((a, b) => b.wonCount - a.wonCount || b.attendedCount - a.attendedCount)
-        .filter(u => u.wonCount > 0 || u.attendedCount > 0);
-
-      setUsers(sortedUsers);
+      setUsers(processedUsers);
       setLoading(false);
     }
     fetchLeaderboard();
   }, []);
 
+  // Compute displayed users based on activeTab
+  const getRankedUsers = () => {
+    let sorted = [...users].sort((a, b) => {
+      if (activeTab === 'solo_wins') return b.soloWonCount - a.soloWonCount || b.attendedCount - a.attendedCount;
+      if (activeTab === 'team_wins') return b.teamWonCount - a.teamWonCount || b.attendedCount - a.attendedCount;
+      if (activeTab === 'attendance') return b.attendedCount - a.attendedCount || b.wonCount - a.wonCount;
+      return b.wonCount - a.wonCount || b.attendedCount - a.attendedCount;
+    });
+
+    sorted = sorted.filter(u => {
+      if (activeTab === 'solo_wins') return u.soloWonCount > 0;
+      if (activeTab === 'team_wins') return u.teamWonCount > 0;
+      if (activeTab === 'attendance') return u.attendedCount > 0;
+      return u.wonCount > 0 || u.attendedCount > 0;
+    });
+
+    let currentRank = 1;
+    let lastScore = null;
+    return sorted.map((u, i) => {
+      let score;
+      if (activeTab === 'solo_wins') score = u.soloWonCount;
+      else if (activeTab === 'team_wins') score = u.teamWonCount;
+      else if (activeTab === 'attendance') score = u.attendedCount;
+      else score = u.wonCount;
+
+      if (lastScore !== score) {
+        currentRank = i + 1;
+        lastScore = score;
+      }
+      return { ...u, rank: currentRank };
+    });
+  };
+
+  const displayedUsers = getRankedUsers();
+
   const exportCSV = () => {
-    if (users.length === 0) return;
-    const headers = ['Rank', 'Name', 'Email', 'Phone', 'College', 'Events Won', 'Events Attended'];
-    const rows = users.map((u, i) => [
-      i + 1,
+    if (displayedUsers.length === 0) return;
+    const headers = ['Rank', 'Name', 'Email', 'Phone', 'College', 'Solo Wins', 'Team Wins', 'Total Wins', 'Events Attended'];
+    const rows = displayedUsers.map(u => [
+      u.rank,
       u.full_name || 'Anonymous',
       u.email || '',
       u.phone || '',
       u.college || '',
+      u.soloWonCount,
+      u.teamWonCount,
       u.wonCount,
       u.attendedCount
     ]);
@@ -93,7 +130,7 @@ export default function ManageLeaderboard() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
         <h1 style={{ fontFamily: 'var(--font-heading)' }}>User Leaderboards</h1>
         
         <motion.button 
@@ -109,8 +146,36 @@ export default function ManageLeaderboard() {
         </motion.button>
       </div>
 
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+        {[
+          { id: 'overall_wins', label: 'Overall Wins' },
+          { id: 'solo_wins', label: 'Solo Events (Wins)' },
+          { id: 'team_wins', label: 'Team Events (Wins)' },
+          { id: 'attendance', label: 'Most Attended' }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              padding: '0.6rem 1.2rem',
+              borderRadius: '999px',
+              border: '1px solid',
+              borderColor: activeTab === tab.id ? 'var(--brand-primary)' : 'var(--glass-border)',
+              background: activeTab === tab.id ? 'rgba(228, 71, 46, 0.1)' : 'var(--glass-bg)',
+              color: activeTab === tab.id ? 'var(--brand-primary)' : 'var(--text-secondary)',
+              fontWeight: activeTab === tab.id ? 600 : 400,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.2s'
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       <div style={{ background: 'var(--glass-bg)', borderRadius: '16px', border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
-        {users.length === 0 ? (
+        {displayedUsers.length === 0 ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             No one has ranked yet. (No wins or attendance recorded).
           </div>
@@ -121,15 +186,15 @@ export default function ManageLeaderboard() {
                 <th style={{ padding: '1rem' }}>Rank</th>
                 <th style={{ padding: '1rem' }}>User</th>
                 <th style={{ padding: '1rem' }}>Contact</th>
-                <th style={{ padding: '1rem' }}>Wins</th>
+                <th style={{ padding: '1rem' }}>Score</th>
                 <th style={{ padding: '1rem' }}>Attendance</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user, index) => (
+              {displayedUsers.map((user) => (
                 <tr key={user.id} style={{ borderBottom: '1px solid var(--glass-border)' }}>
                   <td style={{ padding: '1rem', fontWeight: 'bold' }}>
-                    #{index + 1}
+                    #{user.rank}
                   </td>
                   <td style={{ padding: '1rem' }}>
                     <div style={{ fontWeight: 600 }}>{user.full_name || 'Anonymous'}</div>
@@ -141,7 +206,8 @@ export default function ManageLeaderboard() {
                   </td>
                   <td style={{ padding: '1rem', color: '#E5A900', fontWeight: 'bold' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <Trophy size={16} /> {user.wonCount}
+                      <Trophy size={16} /> 
+                      {activeTab === 'solo_wins' ? user.soloWonCount : activeTab === 'team_wins' ? user.teamWonCount : user.wonCount}
                     </div>
                   </td>
                   <td style={{ padding: '1rem', color: '#168C83', fontWeight: 'bold' }}>

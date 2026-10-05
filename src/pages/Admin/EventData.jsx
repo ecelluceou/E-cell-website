@@ -79,6 +79,7 @@ export default function EventData() {
               team.case_study_members.forEach(member => {
                 allRegs.push({
                   id: member.id,
+                  team_id: team.id,
                   status: member.status || 'registered',
                   registered_at: member.created_at,
                   isCaseStudyMember: true,
@@ -136,29 +137,29 @@ export default function EventData() {
     document.body.removeChild(link);
   };
 
-  const updateStatus = async (registrationId, newStatus, isCaseStudyMember) => {
+  const updateStatus = async (reg, newStatus) => {
     // Optimistic update
-    setRegistrations(regs => regs.map(r => r.id === registrationId ? { ...r, status: newStatus } : r));
+    if (reg.isCaseStudyMember) {
+      setRegistrations(regs => regs.map(r => r.team_id === reg.team_id ? { ...r, status: newStatus } : r));
+    } else {
+      setRegistrations(regs => regs.map(r => r.id === reg.id ? { ...r, status: newStatus } : r));
+    }
     
     let updateError = null;
     
-    if (isCaseStudyMember) {
-      const { error } = await supabase.from('case_study_members').update({ status: newStatus }).eq('id', registrationId);
+    if (reg.isCaseStudyMember) {
+      // Update all members of the team
+      const { error } = await supabase.from('case_study_members').update({ status: newStatus }).eq('team_id', reg.team_id);
       updateError = error;
     } else {
-      const { error } = await supabase.from('event_registrations').update({ status: newStatus }).eq('id', registrationId);
+      const { error } = await supabase.from('event_registrations').update({ status: newStatus }).eq('id', reg.id);
       updateError = error;
     }
 
     if (updateError) {
       console.error("Error updating status:", updateError);
       alert("Failed to update status. Please ensure you have admin permissions and RLS policies are set.");
-      // Revert optimistic update
-      setRegistrations(regs => {
-        // Find the original status by re-fetching or we just rely on a refresh.
-        // For simplicity, we just alert them that it failed.
-        return regs;
-      });
+      // For simplicity, we just alert them that it failed. They can refresh to revert.
     }
   };
 
@@ -319,17 +320,17 @@ export default function EventData() {
                   <td style={{ padding: '1rem', textAlign: 'right' }}>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
                       <button 
-                        onClick={() => updateStatus(reg.id, 'registered', reg.isCaseStudyMember)}
+                        onClick={() => updateStatus(reg, 'registered')}
                         title="Reset to Registered"
                         style={{ background: 'rgba(255,255,255,0.05)', border: 'none', padding: '0.4rem', borderRadius: '6px', color: 'var(--text-secondary)', cursor: 'pointer' }}
                       ><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
                       <button 
-                        onClick={() => updateStatus(reg.id, 'attended', reg.isCaseStudyMember)}
+                        onClick={() => updateStatus(reg, 'attended')}
                         title="Mark as Attended"
                         style={{ background: 'rgba(22,140,131,0.1)', border: 'none', padding: '0.4rem', borderRadius: '6px', color: '#168C83', cursor: 'pointer' }}
                       ><CheckCircle size={16} /></button>
                       <button 
-                        onClick={() => updateStatus(reg.id, 'won', reg.isCaseStudyMember)}
+                        onClick={() => updateStatus(reg, 'won')}
                         title="Mark as Winner"
                         style={{ background: 'rgba(229,169,0,0.1)', border: 'none', padding: '0.4rem', borderRadius: '6px', color: '#E5A900', cursor: 'pointer' }}
                       ><Trophy size={16} /></button>
