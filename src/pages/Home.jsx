@@ -97,7 +97,10 @@ export default function Home() {
             }}>
               Where Ideas Meet Execution<br />
               <span style={{ 
-                color: 'var(--ecell-saffron)'
+                background: 'linear-gradient(135deg, var(--ecell-saffron) 0%, var(--ecell-vermilion) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
               }}>E-CELL UCEOU</span>
             </h1>
 
