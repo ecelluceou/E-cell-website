@@ -17,10 +17,12 @@ export default function EventData() {
   // Fetch all events and initiatives
   useEffect(() => {
     async function loadData() {
-      const { data: eventsData } = await supabase.from('events').select('id, title, registration_type, date, image').order('date', { ascending: false });
+      const { data: eventsData, error: eventErr } = await supabase.from('events').select('*').order('date', { ascending: false });
+      if (eventErr) console.error("Error loading events:", eventErr);
       setEvents(eventsData || []);
 
-      const { data: initData } = await supabase.from('initiatives').select('id, title, created_at, image, link').order('created_at', { ascending: false });
+      const { data: initData, error: initErr } = await supabase.from('initiatives').select('*').order('created_at', { ascending: false });
+      if (initErr) console.error("Error loading initiatives:", initErr);
       setInitiatives(initData || []);
 
       setLoading(false);
