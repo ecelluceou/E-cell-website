@@ -31,7 +31,7 @@ export default function EventData() {
     async function fetchRegistrations() {
       setLoading(true);
       
-      const selectedEvent = events.find(ev => ev.id === selectedEventId);
+      const selectedEvent = events.find(ev => String(ev.id) === String(selectedEventId));
       const isCaseStudy = isTeamEvent(selectedEvent);
 
       let allRegs = [];
@@ -70,7 +70,7 @@ export default function EventData() {
         } else {
           // Filter: include teams that belong to this event OR have no event_id (legacy)
           const relevantTeams = (teamData || []).filter(
-            t => t.event_id === selectedEventId || t.event_id === null || t.event_id === undefined
+            t => String(t.event_id) === String(selectedEventId) || t.event_id === null || t.event_id === undefined
           );
           relevantTeams.forEach(team => {
             if (team.case_study_members) {
