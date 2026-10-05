@@ -156,8 +156,9 @@ export default function TeamCarousel() {
           effect="creative"
           grabCursor={true}
           slidesPerView={1}
-          centeredSlides={true}
-          loop={true}
+          slidesPerGroup={1}
+          speed={600}
+          rewind={true}
           pagination={{
             clickable: true,
           }}
