@@ -65,11 +65,11 @@ export default function Leaderboard() {
     fetchLeaderboard();
   }, []);
 
-  const getRankColor = (rank) => {
-    if (rank === 1) return 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)'; // Gold
-    if (rank === 2) return 'linear-gradient(135deg, #E0E0E0 0%, #9E9E9E 100%)'; // Silver
-    if (rank === 3) return 'linear-gradient(135deg, #CD7F32 0%, #A0522D 100%)'; // Bronze
-    return 'var(--glass-bg)';
+  const getRankAccent = (rank) => {
+    if (rank === 1) return { color: '#FFD700', shadow: 'rgba(255, 215, 0, 0.4)' }; // Gold
+    if (rank === 2) return { color: '#C0C0C0', shadow: 'rgba(192, 192, 192, 0.3)' }; // Silver
+    if (rank === 3) return { color: '#CD7F32', shadow: 'rgba(205, 127, 50, 0.3)' }; // Bronze
+    return { color: 'transparent', shadow: 'transparent' };
   };
 
   const getRankedUsers = () => {
@@ -168,43 +168,82 @@ export default function Leaderboard() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {displayedUsers.map((user, index) => (
-              <motion.div 
-                key={user.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="leaderboard-row"
-                style={{
-                  display: 'flex', alignItems: 'center', padding: '1rem 1.5rem',
-                  background: user.rank <= 3 ? getRankColor(user.rank) : 'var(--glass-bg)',
-                  borderRadius: '16px', border: user.rank > 3 ? '1px solid var(--glass-border)' : 'none',
-                  color: user.rank <= 3 ? (user.rank === 1 ? '#000' : '#fff') : 'var(--text-primary)',
-                  boxShadow: user.rank <= 3 ? '0 10px 30px rgba(0,0,0,0.2)' : 'none',
-                  transform: user.rank === 1 ? 'scale(1.02)' : 'none'
-                }}
-              >
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, width: '40px', opacity: 0.8, fontVariantNumeric: 'tabular-nums' }}>#{user.rank}</div>
-                <img 
-                  src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
-                  alt={user.full_name ? `${user.full_name}'s avatar` : 'Avatar'} 
-                  style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', margin: '0 1.5rem 0 1rem', border: '2px solid rgba(255,255,255,0.2)' }}
-                />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.full_name || 'Anonymous'}</h3>
-                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.8rem', opacity: 0.8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.college || 'Unknown College'}</p>
-                </div>
-                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem', marginLeft: '1rem' }}>
-                  <div style={{ fontWeight: 800, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontVariantNumeric: 'tabular-nums' }}>
-                    {activeTab === 'solo_wins' ? user.soloWonCount : activeTab === 'team_wins' ? user.teamWonCount : activeTab === 'attendance' ? user.attendedCount : user.wonCount}
-                    {activeTab === 'attendance' ? <Award size={16} aria-hidden="true" /> : <Trophy size={16} aria-hidden="true" />}
+            {displayedUsers.map((user, index) => {
+              const isTop3 = user.rank <= 3;
+              const accent = getRankAccent(user.rank);
+              const isRank1 = user.rank === 1;
+
+              return (
+                <motion.div 
+                  key={user.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="leaderboard-row"
+                  style={{
+                    position: 'relative',
+                    display: 'flex', alignItems: 'center', padding: isTop3 ? '1.5rem' : '1rem 1.5rem',
+                    background: isTop3 ? `linear-gradient(90deg, rgba(255,255,255,0.03) 0%, transparent 100%)` : 'var(--glass-bg)',
+                    backgroundColor: 'var(--glass-bg)',
+                    borderRadius: '16px', 
+                    border: isTop3 ? `1px solid ${accent.color}` : '1px solid var(--glass-border)',
+                    boxShadow: isTop3 ? `0 0 20px ${accent.shadow}, inset 0 0 10px ${accent.shadow}` : 'none',
+                    transform: isRank1 ? 'scale(1.02)' : 'none',
+                    zIndex: isRank1 ? 10 : 1,
+                    overflow: 'hidden'
+                  }}
+                >
+                  {/* Decorative glowing orb for top 3 */}
+                  {isTop3 && (
+                    <div style={{
+                      position: 'absolute', top: '-50%', left: '-10%', width: '150px', height: '150px',
+                      background: accent.color, filter: 'blur(60px)', opacity: 0.15, borderRadius: '50%', zIndex: 0
+                    }} />
+                  )}
+
+                  <div style={{ position: 'relative', zIndex: 1, fontSize: isRank1 ? '2rem' : '1.5rem', fontWeight: 900, width: '60px', color: isTop3 ? accent.color : 'var(--text-muted)', fontVariantNumeric: 'tabular-nums', textShadow: isTop3 ? `0 0 10px ${accent.shadow}` : 'none' }}>
+                    #{user.rank}
                   </div>
-                  <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.8 }}>
-                    {activeTab === 'attendance' ? 'Events Attended' : 'Events Won'}
+                  
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    <img 
+                      src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
+                      alt={user.full_name ? `${user.full_name}'s avatar` : 'Avatar'} 
+                      style={{ 
+                        width: isRank1 ? '64px' : '48px', height: isRank1 ? '64px' : '48px', 
+                        borderRadius: '50%', objectFit: 'cover', margin: '0 1.5rem 0 0.5rem', 
+                        border: isTop3 ? `2px solid ${accent.color}` : '2px solid rgba(255,255,255,0.1)',
+                        boxShadow: isTop3 ? `0 0 15px ${accent.shadow}` : 'none'
+                      }}
+                    />
+                    {isRank1 && (
+                      <div style={{ position: 'absolute', top: '-12px', right: '12px', color: accent.color, filter: `drop-shadow(0 0 5px ${accent.color})` }}>
+                        <Trophy size={24} />
+                      </div>
+                    )}
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                  
+                  <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
+                    <h3 style={{ margin: 0, fontSize: isRank1 ? '1.3rem' : '1.1rem', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: isTop3 ? '#fff' : 'var(--text-primary)' }}>
+                      {user.full_name || 'Anonymous'}
+                    </h3>
+                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: isTop3 ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {user.college || 'Unknown College'}
+                    </p>
+                  </div>
+                  
+                  <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem', marginLeft: '1rem', position: 'relative', zIndex: 1 }}>
+                    <div style={{ fontWeight: 900, fontSize: isRank1 ? '1.5rem' : '1.2rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontVariantNumeric: 'tabular-nums', color: isTop3 ? accent.color : 'var(--text-primary)' }}>
+                      {activeTab === 'solo_wins' ? user.soloWonCount : activeTab === 'team_wins' ? user.teamWonCount : activeTab === 'attendance' ? user.attendedCount : user.wonCount}
+                      {activeTab === 'attendance' ? <Award size={isRank1 ? 20 : 16} aria-hidden="true" /> : <Trophy size={isRank1 ? 20 : 16} aria-hidden="true" />}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: isTop3 ? 'rgba(255,255,255,0.6)' : 'var(--text-muted)' }}>
+                      {activeTab === 'attendance' ? 'Events Attended' : 'Events Won'}
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </div>
