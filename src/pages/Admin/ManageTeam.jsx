@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Loader } from '../../components/UI/Loader';
-import { Trash2, Edit3, Image as ImageIcon, Download } from 'lucide-react';
+import { Trash2, Edit3, Image as ImageIcon, Download, ArrowUp, ArrowDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ImageCropperModal from '../../components/UI/ImageCropperModal';
 import { DEFAULT_TEAM } from '../../data/defaultTeam';
@@ -83,6 +83,22 @@ export default function ManageTeam() {
     image: m.image || '', instagram: m.instagram || '', linkedin: m.linkedin || '',
   });
 
+  const moveMember = async (index, dir) => {
+    const target = index + dir;
+    if (target < 0 || target >= members.length) return;
+    const reordered = [...members];
+    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+    const withOrder = reordered.map((m, i) => ({ ...m, sort_order: i }));
+    setMembers(withOrder); // optimistic
+    const changed = withOrder.filter((m, i) => members[i]?.id !== m.id || members[i]?.sort_order !== m.sort_order);
+    const results = await Promise.all(
+      changed.map(m => supabase.from('team_members').update({ sort_order: m.sort_order }).eq('id', m.id))
+    );
+    const failed = results.find(r => r.error);
+    if (failed) alert('Error reordering: ' + failed.error.message);
+    fetchMembers();
+  };
+
   const deleteMember = async (m) => {
     if (!window.confirm(`Remove ${m.name} from the team page?`)) return;
     const { error } = await supabase.from('team_members').delete().eq('id', m.id);
@@ -148,7 +164,7 @@ export default function ManageTeam() {
               </button>
             </div>
           )}
-          {members.map(m => (
+          {members.map((m, idx) => (
             <div key={m.id} style={{ background: 'var(--glass-bg)', padding: '1rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--glass-border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: 0 }}>
                 <img src={m.image || '/placeholder.jpg'} alt="" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />
@@ -158,6 +174,8 @@ export default function ManageTeam() {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button onClick={() => moveMember(idx, -1)} disabled={idx === 0} title="Move up" style={{ background: 'rgba(255,255,255,0.1)', border: 'none', padding: '0.5rem', borderRadius: '8px', color: 'var(--text-primary)', cursor: idx === 0 ? 'default' : 'pointer', opacity: idx === 0 ? 0.3 : 1 }}><ArrowUp size={16} /></button>
+                <button onClick={() => moveMember(idx, 1)} disabled={idx === members.length - 1} title="Move down" style={{ background: 'rgba(255,255,255,0.1)', border: 'none', padding: '0.5rem', borderRadius: '8px', color: 'var(--text-primary)', cursor: idx === members.length - 1 ? 'default' : 'pointer', opacity: idx === members.length - 1 ? 0.3 : 1 }}><ArrowDown size={16} /></button>
                 <button onClick={() => editMember(m)} title="Edit" style={{ background: 'rgba(255,255,255,0.1)', border: 'none', padding: '0.5rem', borderRadius: '8px', color: 'var(--text-primary)', cursor: 'pointer' }}><Edit3 size={16} /></button>
                 <button onClick={() => deleteMember(m)} title="Remove" style={{ background: 'rgba(228,71,46,0.1)', border: 'none', padding: '0.5rem', borderRadius: '8px', color: 'var(--brand-primary)', cursor: 'pointer' }}><Trash2 size={16} /></button>
               </div>
