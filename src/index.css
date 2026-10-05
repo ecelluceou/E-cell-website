@@ -625,3 +625,196 @@ button:focus {
     transform: translateY(-15px);
   }
 }
+
+/* ========================================= */
+/* --- NEW UI/UX UPGRADES & RESPONSIVENESS --- */
+/* ========================================= */
+
+/* --- Admin Layout --- */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding-top: 80px;
+  color: var(--text-primary);
+}
+
+.admin-sidebar {
+  width: 280px;
+  background: var(--glass-bg);
+  border-right: 1px solid var(--glass-border);
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .admin-layout {
+    flex-direction: column;
+  }
+  .admin-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    padding: 1rem;
+  }
+  .admin-main {
+    padding: 1rem;
+  }
+}
+
+/* --- Leaderboard Adjustments --- */
+.leaderboard-row {
+  padding: 1rem 1.5rem;
+}
+.leaderboard-row.top3 {
+  padding: 1.5rem;
+}
+
+.rank-number {
+  position: relative;
+  z-index: 1;
+  font-size: 1.5rem;
+  font-weight: 900;
+  width: 60px;
+  font-variant-numeric: tabular-nums;
+}
+.rank-number.rank-1 {
+  font-size: 2rem;
+}
+
+.leaderboard-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 1.5rem 0 0.5rem;
+}
+.leaderboard-avatar.rank-1 {
+  width: 64px;
+  height: 64px;
+}
+
+.leaderboard-trophy {
+  position: absolute;
+  top: -12px;
+  right: 12px;
+}
+
+.leaderboard-name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.leaderboard-name.rank-1 {
+  font-size: 1.3rem;
+}
+
+.leaderboard-college {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leaderboard-stats {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  margin-left: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.leaderboard-score {
+  font-weight: 900;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-variant-numeric: tabular-nums;
+}
+.leaderboard-score.rank-1 {
+  font-size: 1.5rem;
+}
+
+.leaderboard-stat-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.leaderboard-icon {
+  width: 16px;
+  height: 16px;
+}
+.leaderboard-score.rank-1 .leaderboard-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Mobile Adjustments for Leaderboard */
+@media (max-width: 600px) {
+  .leaderboard-row, .leaderboard-row.top3 {
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+  
+  .rank-number {
+    width: 40px;
+    font-size: 1.2rem;
+  }
+  .rank-number.rank-1 {
+    font-size: 1.5rem;
+  }
+  
+  .leaderboard-avatar {
+    margin: 0 0.5rem;
+    width: 40px;
+    height: 40px;
+  }
+  .leaderboard-avatar.rank-1 {
+    width: 50px;
+    height: 50px;
+  }
+
+  .leaderboard-trophy {
+    top: -8px;
+    right: 4px;
+  }
+
+  .leaderboard-name {
+    font-size: 1rem;
+  }
+  .leaderboard-name.rank-1 {
+    font-size: 1.1rem;
+  }
+  
+  .leaderboard-college {
+    font-size: 0.75rem;
+  }
+  
+  .leaderboard-score {
+    font-size: 1.1rem;
+  }
+  .leaderboard-score.rank-1 {
+    font-size: 1.2rem;
+  }
+
+  .leaderboard-stat-label {
+    font-size: 0.65rem;
+  }
+}

@@ -179,10 +179,10 @@ export default function Leaderboard() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="leaderboard-row"
+                  className={`leaderboard-row ${isTop3 ? 'top3' : ''}`}
                   style={{
                     position: 'relative',
-                    display: 'flex', alignItems: 'center', padding: isTop3 ? '1.5rem' : '1rem 1.5rem',
+                    display: 'flex', alignItems: 'center',
                     background: isTop3 ? `linear-gradient(90deg, rgba(255,255,255,0.03) 0%, transparent 100%)` : 'var(--glass-bg)',
                     backgroundColor: 'var(--glass-bg)',
                     borderRadius: '16px', 
@@ -201,43 +201,42 @@ export default function Leaderboard() {
                     }} />
                   )}
 
-                  <div style={{ position: 'relative', zIndex: 1, fontSize: isRank1 ? '2rem' : '1.5rem', fontWeight: 900, width: '60px', color: isTop3 ? accent.color : 'var(--text-muted)', fontVariantNumeric: 'tabular-nums', textShadow: isTop3 ? `0 0 10px ${accent.shadow}` : 'none' }}>
+                  <div className={`rank-number ${isRank1 ? 'rank-1' : ''}`} style={{ color: isTop3 ? accent.color : 'var(--text-muted)', textShadow: isTop3 ? `0 0 10px ${accent.shadow}` : 'none' }}>
                     #{user.rank}
                   </div>
                   
-                  <div style={{ position: 'relative', zIndex: 1 }}>
+                  <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center' }}>
                     <img 
                       src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
                       alt={user.full_name ? `${user.full_name}'s avatar` : 'Avatar'} 
+                      className={`leaderboard-avatar ${isRank1 ? 'rank-1' : ''}`}
                       style={{ 
-                        width: isRank1 ? '64px' : '48px', height: isRank1 ? '64px' : '48px', 
-                        borderRadius: '50%', objectFit: 'cover', margin: '0 1.5rem 0 0.5rem', 
                         border: isTop3 ? `2px solid ${accent.color}` : '2px solid rgba(255,255,255,0.1)',
                         boxShadow: isTop3 ? `0 0 15px ${accent.shadow}` : 'none'
                       }}
                     />
                     {isRank1 && (
-                      <div style={{ position: 'absolute', top: '-12px', right: '12px', color: accent.color, filter: `drop-shadow(0 0 5px ${accent.color})` }}>
-                        <Trophy size={24} />
+                      <div className="leaderboard-trophy" style={{ color: accent.color, filter: `drop-shadow(0 0 5px ${accent.color})` }}>
+                        <Trophy size={20} />
                       </div>
                     )}
                   </div>
                   
-                  <div style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
-                    <h3 style={{ margin: 0, fontSize: isRank1 ? '1.3rem' : '1.1rem', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: isTop3 ? '#fff' : 'var(--text-primary)' }}>
+                  <div className="leaderboard-user-info" style={{ flex: 1, minWidth: 0, position: 'relative', zIndex: 1 }}>
+                    <h3 className={`leaderboard-name ${isRank1 ? 'rank-1' : ''}`} style={{ color: isTop3 ? '#fff' : 'var(--text-primary)' }}>
                       {user.full_name || 'Anonymous'}
                     </h3>
-                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: isTop3 ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <p className="leaderboard-college" style={{ color: isTop3 ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)' }}>
                       {user.college || 'Unknown College'}
                     </p>
                   </div>
                   
-                  <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem', marginLeft: '1rem', position: 'relative', zIndex: 1 }}>
-                    <div style={{ fontWeight: 900, fontSize: isRank1 ? '1.5rem' : '1.2rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontVariantNumeric: 'tabular-nums', color: isTop3 ? accent.color : 'var(--text-primary)' }}>
+                  <div className="leaderboard-stats">
+                    <div className={`leaderboard-score ${isRank1 ? 'rank-1' : ''}`} style={{ color: isTop3 ? accent.color : 'var(--text-primary)' }}>
                       {activeTab === 'solo_wins' ? user.soloWonCount : activeTab === 'team_wins' ? user.teamWonCount : activeTab === 'attendance' ? user.attendedCount : user.wonCount}
-                      {activeTab === 'attendance' ? <Award size={isRank1 ? 20 : 16} aria-hidden="true" /> : <Trophy size={isRank1 ? 20 : 16} aria-hidden="true" />}
+                      {activeTab === 'attendance' ? <Award className="leaderboard-icon" aria-hidden="true" /> : <Trophy className="leaderboard-icon" aria-hidden="true" />}
                     </div>
-                    <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: isTop3 ? 'rgba(255,255,255,0.6)' : 'var(--text-muted)' }}>
+                    <div className="leaderboard-stat-label" style={{ color: isTop3 ? 'rgba(255,255,255,0.6)' : 'var(--text-muted)' }}>
                       {activeTab === 'attendance' ? 'Events Attended' : 'Events Won'}
                     </div>
                   </div>

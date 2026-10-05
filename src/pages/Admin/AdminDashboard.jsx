@@ -25,17 +25,9 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', paddingTop: '80px', color: 'var(--text-primary)' }}>
+    <div className="admin-layout">
       {/* Sidebar */}
-      <div style={{
-        width: '280px',
-        background: 'var(--glass-bg)',
-        borderRight: '1px solid var(--glass-border)',
-        padding: '2rem 1rem',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.5rem'
-      }}>
+      <div className="admin-sidebar">
         <h2 style={{ paddingLeft: '1rem', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)', color: 'var(--text-secondary)' }}>
           Admin Panel
         </h2>
@@ -70,7 +62,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Content Area */}
-      <div style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+      <div className="admin-main">
         <Routes>
           <Route path="/" element={
             <div>
