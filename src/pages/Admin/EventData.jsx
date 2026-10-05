@@ -1,39 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Loader } from '../../components/UI/Loader';
-import { Download, CheckCircle, Trophy } from 'lucide-react';
+import { Download, CheckCircle, Trophy, ArrowLeft, Calendar, Award } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { isTeamEvent } from '../../lib/eventType';
 
 export default function EventData() {
+  const [viewMode, setViewMode] = useState('list'); // 'list' | 'event' | 'initiative'
   const [events, setEvents] = useState([]);
-  const [selectedEventId, setSelectedEventId] = useState('');
+  const [initiatives, setInitiatives] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
+  
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all events for the dropdown
+  // Fetch all events and initiatives
   useEffect(() => {
-    async function loadEvents() {
-      const { data } = await supabase.from('events').select('id, title, registration_type').order('date', { ascending: false });
-      setEvents(data || []);
-      if (data && data.length > 0) {
-        setSelectedEventId(data[0].id);
-      }
+    async function loadData() {
+      const { data: eventsData } = await supabase.from('events').select('id, title, registration_type, date, image').order('date', { ascending: false });
+      setEvents(eventsData || []);
+
+      const { data: initData } = await supabase.from('initiatives').select('id, title, created_at, image, link').order('created_at', { ascending: false });
+      setInitiatives(initData || []);
+
       setLoading(false);
     }
-    loadEvents();
+    loadData();
   }, []);
 
   // Fetch registrations when an event is selected
   useEffect(() => {
-    if (!selectedEventId) return;
+    if (viewMode !== 'event' || !selectedItem) return;
     
     async function fetchRegistrations() {
       setLoading(true);
       
-      const selectedEvent = events.find(ev => String(ev.id) === String(selectedEventId));
-      const isCaseStudy = isTeamEvent(selectedEvent);
-
+      const isCaseStudy = isTeamEvent(selectedItem);
       let allRegs = [];
 
       // Always fetch regular event_registrations (legacy or fallback registrations)
@@ -45,7 +47,7 @@ export default function EventData() {
           registered_at,
           profiles ( id, full_name, email, college, phone )
         `)
-        .eq('event_id', selectedEventId);
+        .eq('event_id', selectedItem.id);
 
       if (regularError) {
         console.error("Error fetching regular registrations:", regularError);
@@ -54,8 +56,7 @@ export default function EventData() {
       }
 
       if (isCaseStudy) {
-        // Fetch from case study tables - filter by event_id (works after migration)
-        // Also fetch teams without event_id set (legacy data) as fallback
+        // Fetch from case study tables
         const { data: teamData, error: teamError } = await supabase
           .from('case_study_teams')
           .select(`
@@ -68,9 +69,8 @@ export default function EventData() {
         if (teamError) {
           console.error("Error fetching case study registrations:", teamError);
         } else {
-          // Filter: include teams that belong to this event OR have no event_id (legacy)
           const relevantTeams = (teamData || []).filter(
-            t => String(t.event_id) === String(selectedEventId) || t.event_id === null || t.event_id === undefined
+            t => String(t.event_id) === String(selectedItem.id) || t.event_id === null || t.event_id === undefined
           );
           relevantTeams.forEach(team => {
             if (team.case_study_members) {
@@ -95,16 +95,13 @@ export default function EventData() {
         }
       }
 
-
-
-      // Sort combined array by date descending
       allRegs.sort((a, b) => new Date(b.registered_at || 0) - new Date(a.registered_at || 0));
       setRegistrations(allRegs);
       
       setLoading(false);
     }
     fetchRegistrations();
-  }, [selectedEventId, events]);
+  }, [viewMode, selectedItem]);
 
   const exportCSV = () => {
     if (registrations.length === 0) return;
@@ -124,14 +121,14 @@ export default function EventData() {
       }
       row.push(new Date(r.registered_at).toLocaleString());
       row.push(r.status || 'registered');
-      return row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','); // Escape quotes
+      return row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(','); 
     });
     
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `event_${selectedEventId}_attendees.csv`);
+    link.setAttribute("download", `event_${selectedItem.id}_attendees.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -143,33 +140,93 @@ export default function EventData() {
     if (isCaseStudyMember) {
       const { error } = await supabase.from('case_study_members').update({ status: newStatus }).eq('id', registrationId);
       if (error) {
-        console.error("Error updating status (Make sure 'status' column exists on case_study_members):", error);
-        alert("Failed to update status. Please make sure the 'status' column exists in the 'case_study_members' table.");
+        console.error("Error updating status:", error);
+        alert("Failed to update status.");
       }
     } else {
       await supabase.from('event_registrations').update({ status: newStatus }).eq('id', registrationId);
     }
   };
 
-  if (loading && events.length === 0) return <Loader />;
+  if (loading && viewMode === 'list') return <Loader />;
+
+  if (viewMode === 'list') {
+    return (
+      <div>
+        <h1 style={{ fontFamily: 'var(--font-heading)', marginBottom: '2rem' }}>Event Data & Attendance</h1>
+        
+        <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--brand-primary)' }}>
+          <Calendar size={20} /> Events
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem', marginBottom: '3rem' }}>
+          {events.map(ev => (
+            <motion.div
+              key={ev.id}
+              whileHover={{ y: -4 }}
+              onClick={() => { setSelectedItem(ev); setViewMode('event'); setLoading(true); }}
+              style={{
+                background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px',
+                padding: '1.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+              }}
+            >
+              <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{ev.title}</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                {new Date(ev.date).toLocaleDateString()} • {ev.registration_type === 'team' ? 'Team Event' : 'Solo Event'}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--brand-primary)' }}>
+          <Award size={20} /> Initiatives
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+          {initiatives.map(init => (
+            <motion.div
+              key={init.id}
+              whileHover={{ y: -4 }}
+              onClick={() => { setSelectedItem(init); setViewMode('initiative'); }}
+              style={{
+                background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px',
+                padding: '1.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '0.5rem',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+              }}
+            >
+              <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{init.title}</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                Initiative
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ fontFamily: 'var(--font-heading)' }}>Event Data & Attendance</h1>
-        
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <select 
-            value={selectedEventId} 
-            onChange={(e) => setSelectedEventId(e.target.value)}
-            style={{
-              padding: '0.6rem 1rem', background: 'var(--glass-bg)', color: 'white',
-              border: '1px solid var(--glass-border)', borderRadius: '8px', cursor: 'pointer'
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button 
+            onClick={() => setViewMode('list')}
+            style={{ 
+              background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', 
+              color: 'var(--text-primary)', padding: '0.5rem', borderRadius: '8px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}
           >
-            {events.map(ev => <option key={ev.id} value={ev.id} style={{ background: '#222', color: 'white' }}>{ev.title}</option>)}
-          </select>
-
+            <ArrowLeft size={20} />
+          </button>
+          <div>
+            <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', margin: 0 }}>{selectedItem?.title}</h1>
+            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+              {viewMode === 'event' ? 'Event Registrations' : 'Initiative Data'}
+            </div>
+          </div>
+        </div>
+        
+        {viewMode === 'event' && registrations.length > 0 && (
           <motion.button 
             whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
             onClick={exportCSV}
@@ -181,11 +238,22 @@ export default function EventData() {
           >
             <Download size={16} /> Export CSV
           </motion.button>
-        </div>
+        )}
       </div>
 
       <div style={{ background: 'var(--glass-bg)', borderRadius: '16px', border: '1px solid var(--glass-border)', overflow: 'hidden' }}>
-        {loading ? (
+        {viewMode === 'initiative' ? (
+          <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+            Data for initiatives is currently collected via external forms. 
+            {selectedItem?.link && (
+              <div style={{ marginTop: '1rem' }}>
+                <a href={selectedItem.link} target="_blank" rel="noreferrer" style={{ color: 'var(--brand-primary)', textDecoration: 'none', fontWeight: 600 }}>
+                  View External Form →
+                </a>
+              </div>
+            )}
+          </div>
+        ) : loading ? (
           <div style={{ padding: '3rem', textAlign: 'center' }}><Loader /></div>
         ) : registrations.length === 0 ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
