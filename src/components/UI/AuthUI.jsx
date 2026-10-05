@@ -110,13 +110,13 @@ function AuthFormContainer() {
       </div>
 
       {error && (
-        <div className="auth-error">
+        <div className="auth-error" aria-live="polite">
           {error}
         </div>
       )}
 
       {successMessage && (
-        <div className="auth-success" style={{ 
+        <div className="auth-success" aria-live="polite" style={{ 
           background: 'rgba(34, 197, 94, 0.1)', 
           color: '#22c55e', 
           padding: '0.75rem 1rem', 
@@ -130,13 +130,18 @@ function AuthFormContainer() {
       )}
 
       <form onSubmit={handleEmailSignIn} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <label htmlFor="email-input" className="sr-only">Email Address</label>
         <input 
+          id="email-input"
+          name="email"
           type="email" 
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="your.email@example.com"
           className="auth-input-email"
           disabled={loading || successMessage}
+          autoComplete="email"
+          spellCheck={false}
           style={{
             width: '100%',
             padding: '0.85rem 1rem',
@@ -146,7 +151,7 @@ function AuthFormContainer() {
             color: 'var(--text-primary)',
             fontSize: '1rem',
             outline: 'none',
-            transition: 'border-color 0.2s ease'
+            transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
           }}
         />
         <button

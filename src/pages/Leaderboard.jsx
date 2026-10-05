@@ -142,18 +142,20 @@ export default function Leaderboard() {
             { id: 'team_wins', label: 'Team Wins', icon: Trophy, color: '#E5A900', textColor: '#000' },
             { id: 'attendance', label: 'Most Attended', icon: Award, color: '#168C83', textColor: '#fff' }
           ].map(tab => (
-            <button 
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: '0.8rem 1.5rem', borderRadius: '999px', fontWeight: 600, border: 'none', cursor: 'pointer',
-                background: activeTab === tab.id ? tab.color : 'var(--glass-bg)',
-                color: activeTab === tab.id ? tab.textColor : 'white',
-                transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', gap: '0.5rem'
-              }}
-            >
-              <tab.icon size={16} /> {tab.label}
-            </button>
+              <button 
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  padding: '0.8rem 1.5rem', borderRadius: '999px', fontWeight: 600, border: 'none', cursor: 'pointer',
+                  background: activeTab === tab.id ? tab.color : 'var(--glass-bg)',
+                  color: activeTab === tab.id ? tab.textColor : 'white',
+                  transition: 'background-color 0.3s ease, color 0.3s ease, transform 0.2s ease', 
+                  display: 'flex', alignItems: 'center', gap: '0.5rem',
+                  outlineOffset: '2px'
+                }}
+              >
+                <tab.icon size={16} aria-hidden="true" /> {tab.label}
+              </button>
           ))}
         </div>
 
@@ -182,20 +184,20 @@ export default function Leaderboard() {
                   transform: user.rank === 1 ? 'scale(1.02)' : 'none'
                 }}
               >
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, width: '40px', opacity: 0.8 }}>#{user.rank}</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, width: '40px', opacity: 0.8, fontVariantNumeric: 'tabular-nums' }}>#{user.rank}</div>
                 <img 
                   src={user.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`} 
-                  alt={user.full_name} 
+                  alt={user.full_name ? `${user.full_name}'s avatar` : 'Avatar'} 
                   style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', margin: '0 1.5rem 0 1rem', border: '2px solid rgba(255,255,255,0.2)' }}
                 />
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>{user.full_name || 'Anonymous'}</h3>
-                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.8rem', opacity: 0.8 }}>{user.college || 'Unknown College'}</p>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.full_name || 'Anonymous'}</h3>
+                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.8rem', opacity: 0.8, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.college || 'Unknown College'}</p>
                 </div>
-                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem' }}>
-                  <div style={{ fontWeight: 800, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem', marginLeft: '1rem' }}>
+                  <div style={{ fontWeight: 800, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontVariantNumeric: 'tabular-nums' }}>
                     {activeTab === 'solo_wins' ? user.soloWonCount : activeTab === 'team_wins' ? user.teamWonCount : activeTab === 'attendance' ? user.attendedCount : user.wonCount}
-                    {activeTab === 'attendance' ? <Award size={16} /> : <Trophy size={16} />}
+                    {activeTab === 'attendance' ? <Award size={16} aria-hidden="true" /> : <Trophy size={16} aria-hidden="true" />}
                   </div>
                   <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '1px', opacity: 0.8 }}>
                     {activeTab === 'attendance' ? 'Events Attended' : 'Events Won'}

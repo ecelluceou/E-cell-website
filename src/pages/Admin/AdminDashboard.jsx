@@ -42,7 +42,12 @@ export default function AdminDashboard() {
         {sidebarLinks.map(link => {
           const isActive = location.pathname === link.path;
           return (
-            <Link key={link.path} to={link.path} style={{ textDecoration: 'none' }}>
+            <Link 
+              key={link.path} 
+              to={link.path} 
+              style={{ textDecoration: 'none', outline: 'none' }}
+              className="admin-sidebar-link"
+            >
               <motion.div
                 whileHover={{ x: 5, background: 'rgba(255,255,255,0.05)' }}
                 style={{
@@ -52,7 +57,7 @@ export default function AdminDashboard() {
                   background: isActive ? 'rgba(228,71,46,0.1)' : 'transparent',
                   color: isActive ? 'var(--brand-primary)' : 'var(--text-secondary)',
                   fontWeight: isActive ? 600 : 500,
-                  transition: 'all 0.2s'
+                  transition: 'background-color 0.2s, color 0.2s, box-shadow 0.2s'
                 }}
               >
                 {link.icon}
@@ -74,9 +79,14 @@ export default function AdminDashboard() {
               
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                 {sidebarLinks.slice(1).map(link => (
-                  <Link key={link.path} to={link.path} style={{ textDecoration: 'none' }}>
+                  <Link 
+                    key={link.path} 
+                    to={link.path} 
+                    style={{ textDecoration: 'none', outline: 'none' }}
+                    className="admin-grid-link"
+                  >
                     <motion.div
-                      whileHover={{ y: -5, scale: 1.02 }}
+                      whileHover={{ y: -5, scale: 1.02, boxShadow: '0 8px 30px rgba(0,0,0,0.2)' }}
                       whileTap={{ scale: 0.98 }}
                       style={{
                         background: 'var(--glass-bg)',
@@ -90,7 +100,8 @@ export default function AdminDashboard() {
                         gap: '1rem',
                         color: 'var(--text-primary)',
                         boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        transition: 'box-shadow 0.3s ease, border-color 0.3s ease'
                       }}
                     >
                       <div style={{ background: 'rgba(228,71,46,0.1)', color: 'var(--brand-primary)', padding: '1.2rem', borderRadius: '50%' }}>

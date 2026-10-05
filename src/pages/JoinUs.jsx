@@ -177,8 +177,10 @@ export default function JoinUs() {
                 fontSize: '1.1rem',
                 textDecoration: 'none',
                 boxShadow: '0 8px 24px rgba(22, 140, 131, 0.4)',
-                transition: 'all 0.3s ease'
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease'
               }}
+              onFocus={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 28px rgba(22, 140, 131, 0.5)'; }}
+              onBlur={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(22, 140, 131, 0.4)'; }}
               onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 28px rgba(22, 140, 131, 0.5)'; }}
               onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(22, 140, 131, 0.4)'; }}
             >
@@ -229,9 +231,11 @@ export default function JoinUs() {
               fontWeight: 800,
               fontSize: '1.2rem',
               textDecoration: 'none',
-              transition: 'all 0.3s ease',
+              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
               boxShadow: '0 4px 20px rgba(255,255,255,0.2)'
             }}
+            onFocus={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
+            onBlur={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
             onMouseOver={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
             onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
           >
